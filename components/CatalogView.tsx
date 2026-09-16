@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, type FormEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ShoppingCart, Minus, Plus, X } from 'lucide-react'
 
 const menuMapping: Record<string, string[]> = {
   'plywood': ['centuryply', 'globe', 'sigma'],
@@ -51,6 +53,9 @@ export default function CatalogView({
   const [customerName, setCustomerName] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [quantity, setQuantity] = useState('1')
+  const [cartItems, setCartItems] = useState<any[]>([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   // Banner State
   const [currentBannerIdx, setCurrentBannerIdx] = useState(0)
@@ -116,6 +121,31 @@ export default function CatalogView({
     setCustomerName('')
     setMobileNumber('')
     setQuantity('1')
+  }
+
+  const addToCart = (product: any) => {
+    setCartItems((current) => {
+      const existing = current.find((item) => item.id === product.id)
+      if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
+      return [...current, { product, quantity: 1 }]
+    })
+  }
+
+  const updateCartQuantity = (productId: string, delta: number) => {
+    setCartItems((current) => current.flatMap((item) => {
+      if (item.product.id !== productId) return [item]
+      const quantity = item.quantity + delta
+      return quantity > 0 ? [{ ...item, quantity }] : []
+    }))
+  }
+
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+
+  const checkoutCart = () => {
+    if (!cartItems.length) return
+    const lines = cartItems.map((item, index) => `${index + 1}. ${item.product.brands?.name || 'Standard'} ${item.product.title} - Qty: ${item.quantity}`)
+    const text = encodeURIComponent(`Hello Rival Team, I would like to inquire about the following order:\n${lines.join('\n')}\nTotal Items: ${cartCount}\nPlease share availability and final invoice link.`)
+    window.open(`https://wa.me/919876543210?text=${text}`, '_blank', 'noopener,noreferrer')
   }
 
   const submitInquiry = (event: FormEvent<HTMLFormElement>) => {
@@ -240,53 +270,49 @@ export default function CatalogView({
         ].map((item) => {
           const isActive = selectedCategory === item.slug
           const hasDropdown = item.items.length > 0
-
+          const isOpen = openMenu === item.slug
           return (
-            <div key={item.slug} className="relative group">
-              <button
+            <motion.div key={item.slug} layout className="relative">
+              <motion.button
                 type="button"
+                layout
+                onHoverStart={() => hasDropdown && setOpenMenu(item.slug)}
                 onClick={() => {
                   setSelectedCategory(item.slug)
                   setSelectedBrand('all')
                   setSelectedSeries('all')
                   setSelectedThickness('all')
                   setSelectedSize('all')
+                  if (hasDropdown) setOpenMenu(isOpen ? null : item.slug)
                 }}
-                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
+                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
               >
                 {item.label}
-                {hasDropdown && (
-                  <svg className="h-4 w-4 text-slate-500 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m6 9 6 6 6-6" />
-                  </svg>
-                )}
-              </button>
-
-              {hasDropdown && (
-                <div className="pointer-events-none absolute left-0 top-full mt-1 min-w-[180px] translate-y-1 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-lg transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+                {hasDropdown && <span className={`text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>⌄</span>}
+              </motion.button>
+              {hasDropdown && isOpen && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scaleY: 0.85, transformOrigin: 'top' }}
+                  animate={{ opacity: 1, scaleY: 1 }}
+                  exit={{ opacity: 0, scaleY: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+                  onMouseLeave={() => setOpenMenu(null)}
+                  className="absolute left-0 top-full mt-1 min-w-[190px] rounded-3xl border border-slate-200 bg-white p-3 shadow-xl"
+                >
                   <div className="space-y-1">
                     {item.items.map((brand) => (
-                      <button
-                        key={brand}
-                        type="button"
-                        onClick={() => {
-                          setSelectedCategory(item.slug)
-                          setSelectedBrand(brand.toLowerCase())
-                          setSelectedSeries('all')
-                          setSelectedThickness('all')
-                          setSelectedSize('all')
-                        }}
-                        className="block w-full rounded-lg border border-slate-200/60 bg-slate-50 p-2 text-left text-sm font-medium text-slate-900 transition-all duration-200 ease-out hover:translate-x-1 hover:border-l-4 hover:border-l-blue-500 hover:bg-slate-100 hover:shadow-sm"
-                      >
-                        {brand}
-                      </button>
+                      <button key={brand} type="button" onClick={() => { setSelectedCategory(item.slug); setSelectedBrand(brand.toLowerCase()); setOpenMenu(null) }} className="block w-full rounded-lg border border-slate-200/60 bg-slate-50 p-2 text-left text-sm font-medium text-slate-900 transition-all duration-200 ease-out hover:translate-x-1 hover:border-l-4 hover:border-l-blue-500 hover:bg-slate-100 hover:shadow-sm">{brand}</button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )
         })}
+        <button type="button" onClick={() => setIsCartOpen(true)} className="ml-auto flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700" aria-label={`Open cart, ${cartCount} items`}>
+          <ShoppingCart className="h-4 w-4" /> Cart <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs">{cartCount}</span>
+        </button>
       </nav>
 
       {/* 
@@ -360,7 +386,7 @@ export default function CatalogView({
                             </div>
                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                               <span className="text-sm font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                              <button onClick={() => openInquiry(item)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire via WhatsApp</button>
+                              <div className="flex gap-2"><button onClick={() => addToCart(item)} className="rounded border border-slate-300 px-2 py-1.5 text-[10px] font-bold text-slate-700 transition hover:bg-slate-50">Add to Cart</button><button onClick={() => { addToCart(item); setIsCartOpen(true) }} className="rounded bg-slate-900 px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-emerald-600">Buy Now</button></div>
                             </div>
                           </div>
                         </div>
@@ -405,7 +431,7 @@ export default function CatalogView({
                         <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Starting Price</span>
                         <span className="text-lg font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
                       </div>
-                      <button onClick={() => openInquiry(item)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire via WhatsApp</button>
+                      <div className="flex gap-2"><button onClick={() => addToCart(item)} className="rounded-lg border border-slate-300 px-3 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50">Add to Cart</button><button onClick={() => { addToCart(item); setIsCartOpen(true) }} className="rounded-lg bg-slate-900 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-600 shadow-sm">Buy Now</button></div>
                     </div>
                   </div>
                 </div>
@@ -420,6 +446,23 @@ export default function CatalogView({
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCartOpen(false)} className="fixed inset-0 z-[90] bg-slate-950/40 backdrop-blur-sm" />
+            <motion.aside initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 360, damping: 35 }} className="fixed right-0 top-0 z-[100] flex h-full w-full max-w-md flex-col bg-white p-6 text-slate-900 shadow-2xl" aria-label="Shopping cart">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4"><div><p className="text-xs font-bold uppercase tracking-widest text-blue-600">Your order</p><h2 className="text-2xl font-extrabold">Cart <span className="text-slate-400">({cartCount})</span></h2></div><button type="button" onClick={() => setIsCartOpen(false)} aria-label="Close cart" className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100"><X className="h-5 w-5" /></button></div>
+              <div className="flex-1 space-y-4 overflow-y-auto py-5">
+                {cartItems.length === 0 ? <p className="py-12 text-center text-sm text-slate-500">Your cart is empty.</p> : cartItems.map(({ product, quantity }) => (
+                  <div key={product.id} className="flex gap-3 rounded-xl border border-slate-200 p-3"><img src={product.image_urls?.[0]} alt="" className="h-16 w-16 rounded-lg object-cover" /><div className="min-w-0 flex-1"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{product.brands?.name || 'Standard'}</p><p className="truncate text-sm font-bold">{product.title}</p><div className="mt-2 flex items-center justify-between"><div className="flex items-center gap-2 rounded-lg border border-slate-200 px-1"><button type="button" onClick={() => updateCartQuantity(product.id, -1)} aria-label={`Decrease ${product.title}`} className="p-1 text-slate-500 hover:text-slate-900"><Minus className="h-3 w-3" /></button><span className="min-w-5 text-center text-xs font-bold">{quantity}</span><button type="button" onClick={() => updateCartQuantity(product.id, 1)} aria-label={`Increase ${product.title}`} className="p-1 text-slate-500 hover:text-slate-900"><Plus className="h-3 w-3" /></button></div><span className="text-sm font-extrabold">₹{product.base_price?.toLocaleString('en-IN')}</span></div></div></div>
+                ))}
+              </div>
+              <button type="button" disabled={!cartItems.length} onClick={checkoutCart} className="w-full rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40">Inquire Whole Cart on WhatsApp</button>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {inquiryProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setInquiryProduct(null)}>
