@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const menuMapping: Record<string, string[]> = {
   'plywood': ['centuryply', 'globe', 'sigma'],
-  'laminates': ['aica', 'acrylic'], git config --global user.email "your_email@example.com"
+  'laminates': ['aica', 'acrylic'],
   'sanitaryware': ['roca', 'sato'],
   'hardware': ['hepo', 'vrinda']
 }
