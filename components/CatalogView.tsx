@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 
 const menuMapping: Record<string, string[]> = {
   'plywood': ['centuryply', 'globe', 'sigma'],
@@ -47,6 +47,10 @@ export default function CatalogView({
   const [selectedThickness, setSelectedThickness] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
+  const [inquiryProduct, setInquiryProduct] = useState<any | null>(null)
+  const [customerName, setCustomerName] = useState('')
+  const [mobileNumber, setMobileNumber] = useState('')
+  const [quantity, setQuantity] = useState('1')
 
   // Banner State
   const [currentBannerIdx, setCurrentBannerIdx] = useState(0)
@@ -107,10 +111,21 @@ export default function CatalogView({
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
   const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood' || selectedCategory === 'laminates'
 
-  const handleWhatsApp = (title: string, brandName?: string) => {
-    const phone = '919876543210' 
-    const text = encodeURIComponent(`Hello PLY WORLD! I would like to get pricing for:\n*Product:* ${title}\n*Brand:* ${brandName || 'Standard'}`)
-    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${text}`, '_blank')
+  const openInquiry = (product: any) => {
+    setInquiryProduct(product)
+    setCustomerName('')
+    setMobileNumber('')
+    setQuantity('1')
+  }
+
+  const submitInquiry = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!inquiryProduct) return
+
+    const phone = '919876543210'
+    const text = encodeURIComponent(`Hello PLY WORLD! I would like to place an inquiry.\n*Customer:* ${customerName}\n*Mobile:* ${mobileNumber}\n*Product:* ${inquiryProduct.title}\n*Brand:* ${inquiryProduct.brands?.name || 'Standard'}\n*Quantity:* ${quantity}`)
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener,noreferrer')
+    setInquiryProduct(null)
   }
 
   return (
@@ -345,7 +360,7 @@ export default function CatalogView({
                             </div>
                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                               <span className="text-sm font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                              <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire via WhatsApp</button>
+                              <button onClick={() => openInquiry(item)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire via WhatsApp</button>
                             </div>
                           </div>
                         </div>
@@ -390,7 +405,7 @@ export default function CatalogView({
                         <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Starting Price</span>
                         <span className="text-lg font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
                       </div>
-                      <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire via WhatsApp</button>
+                      <button onClick={() => openInquiry(item)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire via WhatsApp</button>
                     </div>
                   </div>
                 </div>
@@ -405,6 +420,34 @@ export default function CatalogView({
           )}
         </div>
       </div>
+
+      {inquiryProduct && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setInquiryProduct(null)}>
+          <div role="dialog" aria-modal="true" aria-labelledby="inquiry-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Product inquiry</p>
+                <h2 id="inquiry-title" className="mt-1 text-xl font-extrabold text-slate-900">{inquiryProduct.title}</h2>
+                <p className="mt-1 text-sm text-slate-500">Share your details and we&apos;ll continue on WhatsApp.</p>
+              </div>
+              <button type="button" aria-label="Close inquiry form" onClick={() => setInquiryProduct(null)} className="rounded-full p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button>
+            </div>
+
+            <form onSubmit={submitInquiry} className="space-y-4">
+              <label className="block text-sm font-semibold text-slate-700">Customer Name
+                <input required value={customerName} onChange={(event) => setCustomerName(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="Your full name" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-700">Mobile Number
+                <input required type="tel" inputMode="tel" pattern="[0-9+()\- ]{7,}" value={mobileNumber} onChange={(event) => setMobileNumber(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="e.g. 9876543210" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-700">Quantity
+                <input required type="number" min="1" step="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+              </label>
+              <button type="submit" className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2">Continue to WhatsApp</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
