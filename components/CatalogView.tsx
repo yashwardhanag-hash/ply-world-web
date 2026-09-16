@@ -16,6 +16,15 @@ const promotionalBanners = [
   { id: 3, brand: 'roca', title: 'Roca Inspira Series', subtitle: 'Minimalist sanitaryware for modern bathrooms.', image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1200&q=80', tag: 'PREMIUM' },
 ]
 
+const showcaseProducts = [
+  { id: 'showcase-roca-inspira', title: 'Inspira Wall-Hung WC', description: 'Contemporary rimless toilet with a clean, compact profile.', base_price: 18990, image_urls: ['https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'roca', name: 'Roca' }, categories: { slug: 'sanitaryware', name: 'Sanitaryware' }, product_variants: [{ id: 'roca-specs', size_ft: 'Wall-hung', thickness_mm: null }, { id: 'roca-finish', size_ft: 'Soft-close seat', thickness_mm: null }] },
+  { id: 'showcase-sato-basin', title: 'SATO Countertop Basin', description: 'Elegant ceramic basin with a smooth alpine white finish.', base_price: 7490, image_urls: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'sato', name: 'SATO' }, categories: { slug: 'sanitaryware', name: 'Sanitaryware' }, product_variants: [{ id: 'sato-size', size_ft: '600 × 400 mm', thickness_mm: null }, { id: 'sato-finish', size_ft: 'Alpine white', thickness_mm: null }] },
+  { id: 'showcase-century-ply', title: 'Sainik 710 BWP Plywood', description: 'Boiling waterproof plywood built for dependable interiors.', base_price: 4250, image_urls: ['https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'centuryply', name: 'CenturyPly' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'century-thickness', size_ft: '8 × 4 ft', thickness_mm: 18 }, { id: 'century-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
+  { id: 'showcase-greenply', title: 'Green Club Plus Plywood', description: 'Premium calibrated plywood for high-performance cabinetry.', base_price: 5180, image_urls: ['https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'greenply', name: 'Greenply' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'green-thickness', size_ft: '8 × 4 ft', thickness_mm: 19 }, { id: 'green-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
+  { id: 'showcase-hafele-handle', title: 'Hafele Matrix Cabinet Handle', description: 'Brushed brass architectural hardware for modern joinery.', base_price: 890, image_urls: ['https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'hafele', name: 'Hafele' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'hafele-length', size_ft: '160 mm centre', thickness_mm: null }, { id: 'hafele-finish', size_ft: 'Brushed brass', thickness_mm: null }] },
+  { id: 'showcase-blum-hinge', title: 'Blum Clip-Top Soft-Close Hinge', description: 'Smooth, silent cabinet movement with dependable adjustment.', base_price: 620, image_urls: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'blum', name: 'Blum' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'blum-opening', size_ft: '110° opening', thickness_mm: null }, { id: 'blum-mount', size_ft: 'Full overlay', thickness_mm: null }] },
+]
+
 export default function CatalogView({
   initialProducts = [],
   categories = [],
@@ -60,8 +69,11 @@ export default function CatalogView({
     return <div className="py-12 text-center text-slate-500 text-sm">Loading catalog...</div>
   }
 
+  // Use live catalog data when available, with a curated six-card showcase for an empty catalog.
+  const catalogProducts = initialProducts.length > 0 ? initialProducts : showcaseProducts
+
   // 1. Get products for current category context
-  const currentCategoryProducts = initialProducts.filter(
+  const currentCategoryProducts = catalogProducts.filter(
     p => selectedCategory === 'all' || p.categories?.slug === selectedCategory
   )
 
@@ -333,7 +345,7 @@ export default function CatalogView({
                             </div>
                             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                               <span className="text-sm font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                              <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire</button>
+                              <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire via WhatsApp</button>
                             </div>
                           </div>
                         </div>
@@ -378,7 +390,7 @@ export default function CatalogView({
                         <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Starting Price</span>
                         <span className="text-lg font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
                       </div>
-                      <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire Now</button>
+                      <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire via WhatsApp</button>
                     </div>
                   </div>
                 </div>
