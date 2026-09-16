@@ -203,52 +203,58 @@ export default function CatalogView({
       </aside>
 
       {/* TOP NAVIGATION */}
-      <nav className="flex flex-wrap gap-4 pb-4 border-b border-slate-200 relative z-50">
-        <button
-          onClick={() => {
-            setSelectedCategory('all'); setSelectedBrand('all'); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all');
-          }}
-          className={`h-11 px-5 rounded-[22px] text-sm font-bold transition-all shadow-sm flex items-center ${selectedCategory === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
-        >
-          All Products
-        </button>
-
-        {categories.map((cat: any) => {
-          const allowedBrandSlugs = menuMapping[cat.slug] || []
-          const categoryBrands = brands.filter(b => allowedBrandSlugs.includes(b.slug))
-          const isActive = selectedCategory === cat.slug
+      <nav className="relative z-50 flex flex-wrap items-start gap-2 pb-4 border-b border-slate-200">
+        {[
+          { label: 'All Products', slug: 'all', items: [] },
+          { label: 'Plywood', slug: 'plywood', items: ['CenturyPly', 'Greenply', 'Archidply'] },
+          { label: 'Laminates', slug: 'laminates', items: [] },
+          { label: 'Sanitaryware', slug: 'sanitaryware', items: ['Roca', 'SATO', 'Kohler', 'Jaquar'] },
+          { label: 'Hardware', slug: 'hardware', items: ['Hafele', 'Ozone', 'Blum'] },
+        ].map((item) => {
+          const isActive = selectedCategory === item.slug
+          const hasDropdown = item.items.length > 0
 
           return (
-            <div key={cat.id} className="relative group z-50 cursor-pointer">
-              <div className="h-11 px-5 flex items-center gap-2 text-sm font-bold opacity-0 pointer-events-none whitespace-nowrap">
-                {cat.name}
-                {categoryBrands.length > 0 && <svg className="w-4 h-4" />}
-              </div>
-
-              <div className={`absolute top-0 left-0 min-w-full bg-white border ${isActive ? 'border-blue-400' : 'border-slate-200'} rounded-[22px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] max-h-11 group-hover:max-h-[400px] flex flex-col z-50`}>
-                <button
-                  onClick={() => { setSelectedCategory(cat.slug); setSelectedBrand('all'); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all'); }}
-                  className={`h-[42px] px-5 w-full flex items-center pt-[10px] gap-2 text-sm font-bold transition-colors whitespace-nowrap ${isActive ? 'text-blue-600' : 'text-slate-700 group-hover:text-blue-600'}`}
-                >
-                  {cat.name}
-                  {categoryBrands.length > 0 && <svg className="w-4 h-4 opacity-50 group-hover:rotate-180 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>}
-                </button>
-
-                {categoryBrands.length > 0 && (
-                  <div className="flex flex-col pb-3 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                    <div className="mx-4 mb-2 border-t border-slate-100"></div>
-                    {categoryBrands.map((brand: any) => (
-                      <button
-                        key={brand.id}
-                        onClick={(e) => { e.stopPropagation(); setSelectedCategory(cat.slug); setSelectedBrand(brand.slug); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all'); }}
-                        className="w-full text-left px-5 py-2.5 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-all duration-300 ease-out hover:translate-x-2 whitespace-nowrap"
-                      >
-                        {brand.name}
-                      </button>
-                    ))}
-                  </div>
+            <div key={item.slug} className="relative group">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(item.slug)
+                  setSelectedBrand('all')
+                  setSelectedSeries('all')
+                  setSelectedThickness('all')
+                  setSelectedSize('all')
+                }}
+                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
+              >
+                {item.label}
+                {hasDropdown && (
+                  <svg className="h-4 w-4 text-slate-500 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m6 9 6 6 6-6" />
+                  </svg>
                 )}
-              </div>
+              </button>
+
+              {hasDropdown && (
+                <div className="pointer-events-none absolute left-0 top-full mt-1 min-w-[160px] translate-y-1 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-lg transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+                  {item.items.map((brand) => (
+                    <button
+                      key={brand}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(item.slug)
+                        setSelectedBrand(brand.toLowerCase())
+                        setSelectedSeries('all')
+                        setSelectedThickness('all')
+                        setSelectedSize('all')
+                      }}
+                      className="block w-full rounded-lg p-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
+                    >
+                      {brand}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )
         })}
