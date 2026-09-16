@@ -207,7 +207,7 @@ export default function CatalogView({
         {[
           { label: 'All Products', slug: 'all', items: [] },
           { label: 'Plywood', slug: 'plywood', items: ['CenturyPly', 'Greenply', 'Archidply'] },
-          { label: 'Laminates', slug: 'laminates', items: [] },
+          { label: 'Laminates', slug: 'laminates', items: ['Aica', 'Merino', 'Greenlam'] },
           { label: 'Sanitaryware', slug: 'sanitaryware', items: ['Roca', 'SATO', 'Kohler', 'Jaquar'] },
           { label: 'Hardware', slug: 'hardware', items: ['Hafele', 'Ozone', 'Blum'] },
         ].map((item) => {
@@ -225,7 +225,7 @@ export default function CatalogView({
                   setSelectedThickness('all')
                   setSelectedSize('all')
                 }}
-                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
+                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
               >
                 {item.label}
                 {hasDropdown && (
@@ -236,23 +236,25 @@ export default function CatalogView({
               </button>
 
               {hasDropdown && (
-                <div className="pointer-events-none absolute left-0 top-full mt-1 min-w-[160px] translate-y-1 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-lg transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
-                  {item.items.map((brand) => (
-                    <button
-                      key={brand}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCategory(item.slug)
-                        setSelectedBrand(brand.toLowerCase())
-                        setSelectedSeries('all')
-                        setSelectedThickness('all')
-                        setSelectedSize('all')
-                      }}
-                      className="block w-full rounded-lg p-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
-                    >
-                      {brand}
-                    </button>
-                  ))}
+                <div className="pointer-events-none absolute left-0 top-full mt-1 min-w-[180px] translate-y-1 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-lg transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className="space-y-1">
+                    {item.items.map((brand) => (
+                      <button
+                        key={brand}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(item.slug)
+                          setSelectedBrand(brand.toLowerCase())
+                          setSelectedSeries('all')
+                          setSelectedThickness('all')
+                          setSelectedSize('all')
+                        }}
+                        className="block w-full rounded-lg border border-slate-200/60 bg-slate-50 p-2 text-left text-sm font-medium text-slate-900 transition-all duration-200 ease-out hover:translate-x-1 hover:border-l-4 hover:border-l-blue-500 hover:bg-slate-100 hover:shadow-sm"
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
