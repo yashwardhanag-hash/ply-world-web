@@ -397,10 +397,15 @@ export default function CatalogView({
                             <div>
                               <span className="text-[10px] uppercase tracking-widest font-black text-slate-500">{item.brands?.name || 'Standard'}</span>
                               <h3 className="text-sm font-bold text-slate-900 mt-1 leading-snug truncate">{item.title}</h3>
+                              <p className="text-slate-600 text-xs mt-1.5 line-clamp-2 leading-relaxed">{item.description}</p>
+                              <div className="mt-2 mb-3">
+                                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Starting Price</span>
+                                <span className="text-lg font-bold text-emerald-600">₹{item.base_price?.toLocaleString('en-IN')}</span>
+                              </div>
                             </div>
-                            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                              <span className="text-sm font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                              <div className="flex items-center gap-2"><button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button><button onClick={() => openInquiry(item)} className="flex items-center gap-1.5 rounded-full bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-100 active:bg-emerald-700">Inquire via WhatsApp</button></div>
+                            <div className="w-full flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button>
+                              <button onClick={() => openInquiry(item)} className="flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-100 active:bg-emerald-700">Inquire via WhatsApp</button>
                             </div>
                           </div>
                         </div>
@@ -440,12 +445,13 @@ export default function CatalogView({
                         </div>
                       )}
                     </div>
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Starting Price</span>
-                        <span className="text-lg font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                      </div>
-                      <div className="flex items-center gap-2"><button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button><button onClick={() => openInquiry(item)} className="flex items-center gap-1.5 rounded-full bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-100 active:bg-emerald-700">Inquire via WhatsApp</button></div>
+                    <div className="mt-2 mb-3">
+                      <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Starting Price</span>
+                      <span className="text-lg font-bold text-emerald-600">₹{item.base_price?.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="w-full flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                      <button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button>
+                      <button onClick={() => openInquiry(item)} className="flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-100 active:bg-emerald-700">Inquire via WhatsApp</button>
                     </div>
                   </div>
                 </div>
