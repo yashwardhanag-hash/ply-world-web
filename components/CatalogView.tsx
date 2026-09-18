@@ -23,6 +23,14 @@ const brandNames: Record<string, string> = {
   vrinda: 'Vrinda',
 }
 
+function ThicknessIcon() {
+  return (
+    <svg className="w-6 h-6 flex-shrink-0 text-amber-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+    </svg>
+  )
+}
+
 // 1. DUMMY BANNER DATA (You will replace these images with your actual banners)
 const promotionalBanners = [
   { id: 1, brand: 'all', title: 'The Ultimate Plywood Collection', subtitle: 'Explore our premium range of BWP and MR grade materials.', image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80', tag: 'TRENDING' },
@@ -273,7 +281,7 @@ export default function CatalogView({
           {showThicknessFilter && (
             <div className="px-2 group/filter">
               <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                <svg className="w-6 h-6 flex-shrink-0 text-amber-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                <ThicknessIcon />
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Thickness (mm)</span>
                   <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -287,9 +295,9 @@ export default function CatalogView({
             <>
               <div className="px-2 group/filter">
                 <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <svg className="w-6 h-6 flex-shrink-0 text-amber-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4-8 4s-8-1.79-8-4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                  <ThicknessIcon />
                   <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                    <span className="text-sm font-semibold">Thickness</span>
+                    <span className="text-sm font-semibold">Thickness (mm)</span>
                     <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                   </div>
                 </div>
