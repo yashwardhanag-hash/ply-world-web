@@ -35,6 +35,8 @@ const showcaseProducts = [
   { id: 'showcase-sato-basin', title: 'SATO Countertop Basin', description: 'Elegant ceramic basin with a smooth alpine white finish.', base_price: 7490, image_urls: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'sato', name: 'SATO' }, categories: { slug: 'sanitaryware', name: 'Sanitaryware' }, product_variants: [{ id: 'sato-size', size_ft: '600 × 400 mm', thickness_mm: null }, { id: 'sato-finish', size_ft: 'Alpine white', thickness_mm: null }] },
   { id: 'showcase-century-ply', title: 'Sainik 710 BWP Plywood', description: 'Boiling waterproof plywood built for dependable interiors.', base_price: 4250, image_urls: ['https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'century', name: 'Century' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'century-thickness', size_ft: '8 × 4 ft', thickness_mm: 18 }, { id: 'century-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
   { id: 'showcase-greenply', title: 'Green Club Plus Plywood', description: 'Premium calibrated plywood for high-performance cabinetry.', base_price: 5180, image_urls: ['https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'globe', name: 'Globe' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'green-thickness', size_ft: '8 × 4 ft', thickness_mm: 19 }, { id: 'green-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
+  { id: 'showcase-aica-laminate', title: 'Aica Suede Surface Laminate', description: 'Soft-touch decorative laminate for refined residential interiors.', base_price: 2890, image_urls: ['https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'aica', name: 'Aica' }, categories: { slug: 'laminates', name: 'Laminates' }, product_variants: [{ id: 'aica-thickness', size_ft: '8 × 4 ft', thickness_mm: 1, finish_type: 'SF' }, { id: 'aica-finish', size_ft: '8 × 4 ft', thickness_mm: 1, finish_type: 'Texture' }] },
+  { id: 'showcase-acrylic-laminate', title: 'Acrylic Hi-Gloss Laminate', description: 'Reflective acrylic surface with a durable, easy-clean finish.', base_price: 3490, image_urls: ['https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'acrylic', name: 'Acrylic' }, categories: { slug: 'laminates', name: 'Laminates' }, product_variants: [{ id: 'acrylic-thickness', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Hi-Gloss' }, { id: 'acrylic-finish', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Acrylic' }] },
   { id: 'showcase-hafele-handle', title: 'Hafele Matrix Cabinet Handle', description: 'Brushed brass architectural hardware for modern joinery.', base_price: 890, image_urls: ['https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'hepo', name: 'Hepo' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'hafele-length', size_ft: '160 mm centre', thickness_mm: null }, { id: 'hafele-finish', size_ft: 'Brushed brass', thickness_mm: null }] },
   { id: 'showcase-blum-hinge', title: 'Blum Clip-Top Soft-Close Hinge', description: 'Smooth, silent cabinet movement with dependable adjustment.', base_price: 620, image_urls: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'vrinda', name: 'Vrinda' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'blum-opening', size_ft: '110° opening', thickness_mm: null }, { id: 'blum-mount', size_ft: 'Full overlay', thickness_mm: null }] },
 ]
@@ -59,6 +61,7 @@ export default function CatalogView({
   const [selectedBrand, setSelectedBrand] = useState<string>('all')
   const [selectedSeries, setSelectedSeries] = useState<string>('all')
   const [selectedThickness, setSelectedThickness] = useState<string>('all')
+  const [selectedFinish, setSelectedFinish] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
   const [inquiryProduct, setInquiryProduct] = useState<any | null>(null)
@@ -121,13 +124,21 @@ export default function CatalogView({
     const matchesBrand = selectedBrand === 'all' || product.brands?.slug === selectedBrand
     const matchesSeries = selectedSeries === 'all' || product.series?.slug === selectedSeries
     const matchesThickness = selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
+    const matchesFinish = selectedFinish === 'all' || product.finish_type === selectedFinish || product.product_variants?.some((v: any) => {
+      const finish = v.finish_type || v.finish || v.finishType
+      return finish?.toLowerCase() === selectedFinish.toLowerCase()
+    })
     const matchesSize = selectedSize === 'all' || product.product_variants?.some((v: any) => v.size_ft === selectedSize)
-    
-    return matchesBrand && matchesSeries && matchesThickness && matchesSize
+
+    return matchesBrand && matchesSeries && matchesThickness && matchesFinish && matchesSize
   })
+
+  const laminateThicknessOptions = ['0.8', '1']
+  const laminateFinishOptions = ['SF', 'Hi-Gloss', 'Texture', 'Unicore', 'PVC', 'Acrylic']
 
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
+  const showLaminateFilters = selectedCategory === 'laminates'
   const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood' || selectedCategory === 'laminates'
 
   const openInquiry = (product: any) => {
@@ -270,6 +281,51 @@ export default function CatalogView({
               </div>
             </div>
           )}
+
+          {/* Laminate-specific filters */}
+          {showLaminateFilters && (
+            <>
+              <div className="px-2 group/filter">
+                <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                  <svg className="w-6 h-6 flex-shrink-0 text-amber-300 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" /></svg>
+                  <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                    <span className="text-sm font-semibold">Thickness</span>
+                    <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
+                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                    <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === 'all' ? 'text-amber-300' : 'text-slate-200 hover:text-white'}`}>All Thicknesses</button>
+                    {laminateThicknessOptions.map((thickness) => (
+                      <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === thickness ? 'text-amber-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
+                        {thickness} mm
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-2 group/filter">
+                <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                  <svg className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                  <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                    <span className="text-sm font-semibold">Finish Type</span>
+                    <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
+                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedFinish === 'all' ? 'text-cyan-300' : 'text-slate-200 hover:text-white'}`}>All Finishes</button>
+                    {laminateFinishOptions.map((finish) => (
+                      <button key={finish} type="button" onClick={() => setSelectedFinish(selectedFinish === finish ? 'all' : finish)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedFinish === finish ? 'text-cyan-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
+                        {finish}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </aside>
 
@@ -296,6 +352,7 @@ export default function CatalogView({
                   setSelectedBrand('all')
                   setSelectedSeries('all')
                   setSelectedThickness('all')
+                  setSelectedFinish('all')
                   setSelectedSize('all')
                   if (hasDropdown) setOpenMenu(isOpen ? null : item.slug)
                 }}
