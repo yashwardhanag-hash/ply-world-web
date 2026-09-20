@@ -141,13 +141,36 @@ export default function CatalogView({
     return matchesBrand && matchesSeries && matchesThickness && matchesFinish && matchesSize
   })
 
-  const laminateThicknessOptions = ['0.8', '1']
-  const laminateFinishOptions = ['SF', 'Hi-Gloss', 'Texture', 'Unicore', 'PVC', 'Acrylic']
+  const laminateThicknessOptions = ['1', '0.8']
+  const laminateFinishGroups = [
+    {
+      title: 'Woodgrains',
+      finishes: [
+        { label: 'Woodgrain Matt / Velvet Finish (WM)', value: 'WM', thicknesses: ['1'] },
+        { label: 'Real Wood Finish (REW)', value: 'REW', thicknesses: ['1', '0.8'] },
+        { label: 'Deep Matt Finish (DM)', value: 'DM', thicknesses: ['1'] },
+        { label: 'Art Wood Finish (AW)', value: 'AW', thicknesses: ['0.8'] },
+      ],
+    },
+    {
+      title: 'Abstracts & Stones',
+      finishes: [
+        { label: 'Plush Leather / Matt Finish (PL)', value: 'PL', thicknesses: ['1', '0.8'] },
+        { label: 'Linear Wood / Texture Finish (LW)', value: 'LW', thicknesses: ['0.8'] },
+        { label: 'Deep Matt Finish (DM)', value: 'DM', thicknesses: ['1'] },
+        { label: 'Fabric Finish (FAB)', value: 'FAB', thicknesses: ['1', '0.8'] },
+      ],
+    },
+    { title: 'New Textures', finishes: [{ label: 'Mono Line Finish (ML)', value: 'ML', thicknesses: ['0.8'] }] },
+    { title: 'Premium Veltouch Collection', finishes: [{ label: 'Matt / Anti-Fingerprint Finish (VEL)', value: 'VEL', thicknesses: ['1'] }] },
+    { title: 'Luce Shimmer Collection', finishes: [{ label: 'Shimmer Finish (SHM)', value: 'SHM', thicknesses: ['0.8'] }] },
+  ]
+  const laminateFinishOptions = laminateFinishGroups.flatMap((group) => group.finishes)
 
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
   const showLaminateFilters = selectedCategory === 'laminates'
-  const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood' || selectedCategory === 'laminates'
+  const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
 
   const openInquiry = (product: any) => {
     setInquiryProduct(product)
@@ -298,12 +321,11 @@ export default function CatalogView({
                   <ThicknessIcon />
                   <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                     <span className="text-sm font-semibold">Thickness (mm)</span>
-                    <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                   </div>
                 </div>
                 <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                   <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
-                    <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === 'all' ? 'text-amber-300' : 'text-slate-200 hover:text-white'}`}>All Thicknesses</button>
                     {laminateThicknessOptions.map((thickness) => (
                       <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === thickness ? 'text-amber-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
                         {thickness} mm
@@ -315,19 +337,33 @@ export default function CatalogView({
 
               <div className="px-2 group/filter">
                 <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <svg className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                  <svg className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h-16" /></svg>
                   <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                    <span className="text-sm font-semibold">Finish Type</span>
-                    <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    <span className="text-sm font-semibold">Finish Types / Categories</span>
+                    <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                   </div>
                 </div>
-                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-                  <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
-                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedFinish === 'all' ? 'text-cyan-300' : 'text-slate-200 hover:text-white'}`}>All Finishes</button>
-                    {laminateFinishOptions.map((finish) => (
-                      <button key={finish} type="button" onClick={() => setSelectedFinish(selectedFinish === finish ? 'all' : finish)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedFinish === finish ? 'text-cyan-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
-                        {finish}
-                      </button>
+                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-[32rem] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  <div className="pl-12 pr-3 py-2 flex flex-col gap-2 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-xs font-semibold transition-colors ${selectedFinish === 'all' ? 'text-cyan-300' : 'text-slate-400 hover:text-white'}`}>All finishes</button>
+                    {laminateFinishGroups.map((group) => (
+                      <details key={group.title} className="group/finish rounded-lg border border-slate-800/80 bg-slate-950/30" open>
+                        <summary className="flex cursor-pointer list-none items-center justify-between px-2 py-2 text-xs font-semibold text-slate-200 hover:text-white">
+                          {group.title}
+                          <span className="text-slate-500 transition-transform group-open/finish:rotate-180">⌄</span>
+                        </summary>
+                        <div className="flex flex-col gap-1 px-2 pb-2">
+                          {group.finishes.map((finish) => {
+                            const available = finish.thicknesses.includes(selectedThickness === 'all' ? '1' : selectedThickness)
+                            const selected = selectedFinish === finish.value
+                            return (
+                              <button key={`${group.title}-${finish.value}`} type="button" disabled={!available} onClick={() => setSelectedFinish(selected ? 'all' : finish.value)} className={`rounded-md px-2 py-1.5 text-left text-[11px] font-medium transition-all ${available ? selected ? 'bg-cyan-400/15 text-cyan-200' : 'text-slate-300 hover:bg-white/10 hover:text-white' : 'cursor-not-allowed text-slate-600 opacity-40'}`}>
+                                {finish.label}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </details>
                     ))}
                   </div>
                 </div>
@@ -393,6 +429,23 @@ export default function CatalogView({
           <ShoppingCart className="h-4 w-4" /> Cart <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs">{cartCount}</span>
         </button>
       </nav>
+
+      {showLaminateFilters && (selectedThickness !== 'all' || selectedFinish !== 'all') && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Active filters</span>
+          {selectedThickness !== 'all' && (
+            <button type="button" onClick={() => setSelectedThickness('all')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200">
+              {selectedThickness} mm <X className="h-3 w-3" />
+            </button>
+          )}
+          {selectedFinish !== 'all' && (
+            <button type="button" onClick={() => setSelectedFinish('all')} className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-800 transition-colors hover:bg-cyan-100">
+              {laminateFinishOptions.find((finish) => finish.value === selectedFinish)?.label || selectedFinish} <X className="h-3 w-3" />
+            </button>
+          )}
+          <button type="button" onClick={() => { setSelectedThickness('all'); setSelectedFinish('all') }} className="text-xs font-semibold text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline">Clear all</button>
+        </div>
+      )}
 
       {/* 
         =====================================================================
