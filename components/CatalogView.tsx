@@ -3,6 +3,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShoppingCart, Minus, Plus, X, Sparkles } from 'lucide-react'
+import laminatesData from '@/data/laminatesData.json'
 
 const menuMapping: Record<string, string[]> = {
   plywood: ['century', 'globe', 'sigma'],
@@ -47,7 +48,24 @@ const showcaseProducts = [
   { id: 'showcase-acrylic-laminate', title: 'Acrylic Hi-Gloss Laminate', description: 'Reflective acrylic surface with a durable, easy-clean finish.', base_price: 3490, image_urls: ['https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'acrylic', name: 'Acrylic' }, categories: { slug: 'laminates', name: 'Laminates' }, product_variants: [{ id: 'acrylic-thickness', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Hi-Gloss' }, { id: 'acrylic-finish', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Acrylic' }] },
   { id: 'showcase-hafele-handle', title: 'Hafele Matrix Cabinet Handle', description: 'Brushed brass architectural hardware for modern joinery.', base_price: 890, image_urls: ['https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'hepo', name: 'Hepo' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'hafele-length', size_ft: '160 mm centre', thickness_mm: null }, { id: 'hafele-finish', size_ft: 'Brushed brass', thickness_mm: null }] },
   { id: 'showcase-blum-hinge', title: 'Blum Clip-Top Soft-Close Hinge', description: 'Smooth, silent cabinet movement with dependable adjustment.', base_price: 620, image_urls: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'vrinda', name: 'Vrinda' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'blum-opening', size_ft: '110° opening', thickness_mm: null }, { id: 'blum-mount', size_ft: 'Full overlay', thickness_mm: null }] },
-]
+  ]
+
+const importedLaminateProducts = laminatesData.map((laminate) => ({
+  id: laminate.id,
+  title: `${laminate.code} ${laminate.name}`,
+  description: `${laminate.category} laminate with ${laminate.finishType} finish.`,
+  base_price: 0,
+  image_urls: [laminate.image],
+  brands: { slug: 'aica', name: 'Aica' },
+  categories: { slug: 'laminates', name: 'Laminates' },
+  product_variants: laminate.thicknesses.map((thickness, index) => ({
+    id: `${laminate.id}-thickness-${index}`,
+    size_ft: '8 × 4 ft',
+    thickness_mm: Number.parseFloat(thickness),
+    finish_type: laminate.finishCode,
+  })),
+  finish_type: laminate.finishCode,
+}))
 
 export default function CatalogView({
   initialProducts = [],
@@ -104,7 +122,9 @@ export default function CatalogView({
   }
 
   // Use live catalog data when available, with a curated six-card showcase for an empty catalog.
-  const catalogProducts = initialProducts.length > 0 ? initialProducts : showcaseProducts
+  const catalogProducts = initialProducts.length > 0
+    ? initialProducts
+    : [...showcaseProducts, ...importedLaminateProducts]
 
   // 1. Get products for current category context
   const currentCategoryProducts = catalogProducts.filter(

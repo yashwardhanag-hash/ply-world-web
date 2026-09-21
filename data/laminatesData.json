@@ -1,0 +1,22 @@
+[
+  {
+    "id": "wp-274",
+    "code": "WP 274",
+    "name": "Komori",
+    "category": "Woodgrains",
+    "finishType": "Woodgrain Matt / Velvet Finish (WM)",
+    "finishCode": "WM",
+    "thicknesses": ["1mm"],
+    "image": "https://your-image-hosting.com/wp-274.jpg"
+  },
+  {
+    "id": "g-499",
+    "code": "G 499 / 1499",
+    "name": "Frosty White",
+    "category": "New Textures",
+    "finishType": "Mono Line Finish (ML)",
+    "finishCode": "ML",
+    "thicknesses": ["1mm", "0.8mm"],
+    "image": "https://your-image-hosting.com/g-499.jpg"
+  }
+]
