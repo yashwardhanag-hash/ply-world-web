@@ -7,6 +7,9 @@
     "finishType": "Woodgrain Matt / Velvet Finish (WM)",
     "finishCode": "WM",
     "thicknesses": ["1mm"],
+    "price": 2450,
+    "currency": "₹",
+    "unit": "sheet",
     "image": "https://your-image-hosting.com/wp-274.jpg"
   },
   {
@@ -17,6 +20,9 @@
     "finishType": "Mono Line Finish (ML)",
     "finishCode": "ML",
     "thicknesses": ["1mm", "0.8mm"],
+    "price": null,
+    "currency": "₹",
+    "unit": "sheet",
     "image": "https://your-image-hosting.com/g-499.jpg"
   }
 ]

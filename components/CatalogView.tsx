@@ -52,9 +52,12 @@ const showcaseProducts = [
 
 const importedLaminateProducts = laminatesData.map((laminate) => ({
   id: laminate.id,
-  title: `${laminate.code} ${laminate.name}`,
+  title: laminate.name,
+  code: laminate.code,
   description: `${laminate.category} laminate with ${laminate.finishType} finish.`,
-  base_price: 0,
+  base_price: laminate.price,
+  currency: laminate.currency,
+  unit: laminate.unit,
   image_urls: [laminate.image],
   brands: { slug: 'aica', name: 'Aica' },
   categories: { slug: 'laminates', name: 'Laminates' },
@@ -93,6 +96,7 @@ export default function CatalogView({
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
   const [inquiryProduct, setInquiryProduct] = useState<any | null>(null)
   const [detailProduct, setDetailProduct] = useState<any | null>(null)
+  const [isDetailZoomed, setIsDetailZoomed] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [quantity, setQuantity] = useState('1')
@@ -360,7 +364,7 @@ export default function CatalogView({
 
               <div className="px-2 group/filter">
                 <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <Sparkles className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" title="Finish Collections" />
+                  <Sparkles className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" />
                   <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                     <span className="text-sm font-semibold">Finish Types / Categories</span>
                     <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -537,10 +541,10 @@ export default function CatalogView({
                     </div>
                     <div className="relative flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar">
                       {productsInStrip.map((item: any) => (
-                        <div key={item.id} onClick={() => setDetailProduct(item)} className="min-w-[260px] w-[260px] cursor-pointer snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform duration-200 hover:scale-105 hover:shadow-xl">
-                          <div className="group/img relative h-40 overflow-hidden bg-slate-100"><img src={item.image_urls?.[0] || 'https://via.placeholder.com/400'} alt={item.title} className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-110" /></div>
-                          <div className="p-4"><div className="flex items-center justify-between gap-2"><span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.code || item.brands?.name || 'AICA'}</span><span className="rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-700">{item.product_variants?.[0]?.finish_type || 'Laminate'}</span></div><h4 className="mt-2 text-sm font-bold text-slate-900">{item.title}</h4><p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{item.description}</p><div className="mt-3 flex items-center justify-between"><span className="text-sm font-extrabold text-emerald-600">₹{item.base_price?.toLocaleString('en-IN')}</span><span className="text-[10px] font-bold text-slate-400">View details</span></div></div>
-                        </div>
+                        <button type="button" key={item.id} onClick={() => { setDetailProduct(item); setIsDetailZoomed(false) }} className="group min-w-[260px] w-[260px] cursor-pointer snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-transform duration-200 hover:scale-105 hover:shadow-xl">
+                          <div className="relative h-40 overflow-hidden bg-slate-100"><img src={item.image_urls?.[0]} alt={`${item.title} laminate swatch`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" /><span className="absolute bottom-3 left-3 rounded-full bg-slate-950/75 px-3 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">View Full Preview</span></div>
+                          <div className="p-4"><div className="flex items-center justify-between gap-2"><span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.code || item.brands?.name || 'AICA'}</span><span className="rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-700">{item.product_variants?.[0]?.finish_type || 'Laminate'}</span></div><h4 className="mt-2 text-sm font-bold text-slate-900">{item.title}</h4><p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{item.description}</p><div className="mt-3"><span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Starting Price</span><p className="text-sm font-extrabold text-emerald-600">{item.base_price ? `${item.currency || '₹'} ${item.base_price.toLocaleString('en-IN')} / ${item.unit || 'sheet'}` : 'Contact for Price'}</p></div></div>
+                        </button>
                       ))}
                     </div>
                   </section>
@@ -553,10 +557,11 @@ export default function CatalogView({
             */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {finalFilteredProducts.map((item: any) => (
-                <div key={item.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
+                <div key={item.id} onClick={() => item.categories?.slug === 'laminates' && (setDetailProduct(item), setIsDetailZoomed(false))} className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300 ${item.categories?.slug === 'laminates' ? 'cursor-pointer' : ''}`}>
                   <div className="h-48 bg-slate-100 relative overflow-hidden group/img">
                     <img src={item.image_urls?.[0] || 'https://via.placeholder.com/400'} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
                     <span className="absolute top-3 left-3 bg-slate-900/90 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded backdrop-blur-sm shadow-sm">{item.categories?.name}</span>
+                    {item.categories?.slug === 'laminates' && <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/75 px-3 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">View Full Preview</span>}
                     {item.series?.name && <span className="absolute top-3 right-3 bg-blue-600/95 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded shadow-sm">{item.series.name}</span>}
                   </div>
                   <div className="p-5 flex-1 flex flex-col justify-between">
@@ -579,7 +584,7 @@ export default function CatalogView({
                     </div>
                     <div className="mt-2 mb-3">
                       <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Starting Price</span>
-                      <span className="text-lg font-bold text-emerald-600">₹{item.base_price?.toLocaleString('en-IN')}</span>
+                      <span className="text-lg font-bold text-emerald-600">{item.base_price ? `${item.currency || '₹'}${item.base_price.toLocaleString('en-IN')} / ${item.unit || 'sheet'}` : 'Contact for Price'}</span>
                     </div>
                     <div className="w-full flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
                       <button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button>
@@ -646,8 +651,11 @@ export default function CatalogView({
 
       {detailProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setDetailProduct(null)}>
-          <div role="dialog" aria-modal="true" aria-labelledby="laminate-detail-title" className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl">
-            <div className="grid md:grid-cols-2"><img src={detailProduct.image_urls?.[0] || 'https://via.placeholder.com/800'} alt={detailProduct.title} className="h-64 w-full object-cover md:h-full" /><div className="p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-widest text-cyan-600">AICA Laminates</p><h2 id="laminate-detail-title" className="mt-2 text-2xl font-extrabold">{detailProduct.title}</h2></div><button type="button" onClick={() => setDetailProduct(null)} aria-label="Close details" className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button></div><p className="mt-3 text-sm leading-relaxed text-slate-600">{detailProduct.description}</p><div className="mt-5 flex flex-wrap gap-2">{detailProduct.product_variants?.map((variant: any) => <span key={variant.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{variant.finish_type || 'Laminate'} · {variant.thickness_mm} mm</span>)}</div><p className="mt-6 text-xl font-extrabold text-emerald-600">₹{detailProduct.base_price?.toLocaleString('en-IN')}</p><button type="button" onClick={() => { setDetailProduct(null); openInquiry(detailProduct) }} className="mt-6 w-full rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Inquire via WhatsApp</button></div></div>
+          <div role="dialog" aria-modal="true" aria-labelledby="laminate-detail-title" className="w-full max-w-3xl overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl">
+            <div className="grid md:grid-cols-2">
+              <div className="group/preview relative min-h-64 overflow-hidden bg-slate-100 md:min-h-[420px]"><img src={detailProduct.image_urls?.[0]} alt={`${detailProduct.title} full laminate preview`} className={`h-full w-full object-cover transition-transform duration-500 ${isDetailZoomed ? 'scale-150' : 'scale-100'}`} /><button type="button" onClick={() => setIsDetailZoomed((zoomed) => !zoomed)} className="absolute bottom-4 left-4 rounded-full bg-slate-950/75 px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-950">{isDetailZoomed ? 'Reset Preview' : 'Zoom Preview'}</button></div>
+              <div className="p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-widest text-cyan-600">{detailProduct.categories?.name || 'Laminates'}</p><p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{detailProduct.code || detailProduct.brands?.name}</p><h2 id="laminate-detail-title" className="mt-1 text-2xl font-extrabold">{detailProduct.title}</h2></div><button type="button" onClick={() => setDetailProduct(null)} aria-label="Close details" className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button></div><p className="mt-3 text-sm leading-relaxed text-slate-600">{detailProduct.description}</p><p className="mt-5 text-xl font-extrabold text-emerald-600">{detailProduct.base_price ? `${detailProduct.currency || '₹'} ${detailProduct.base_price.toLocaleString('en-IN')} / ${detailProduct.unit || 'sheet'}` : 'Contact for Price'}</p><div className="mt-5"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Finish Type</p><p className="mt-1 text-sm font-semibold text-slate-800">{detailProduct.finishType || detailProduct.description}</p></div><div className="mt-5"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Available Thickness</p><div className="mt-2 flex flex-wrap gap-2">{detailProduct.product_variants?.map((variant: any) => <span key={variant.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{variant.thickness_mm} mm</span>)}</div></div><div className="mt-6 flex flex-col gap-2 sm:flex-row"><button type="button" onClick={() => { setDetailProduct(null); openInquiry(detailProduct) }} className="flex-1 rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Inquire Now</button><button type="button" onClick={() => { addToCart(detailProduct); setDetailProduct(null) }} className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 transition hover:bg-slate-100">Add to Quote</button></div></div>
+            </div>
           </div>
         </div>
       )}
