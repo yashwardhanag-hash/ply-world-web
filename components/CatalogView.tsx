@@ -173,7 +173,7 @@ export default function CatalogView({
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
   const showLaminateFilters = selectedCategory === 'laminates'
-  const showSizeFilter = false
+  const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
 
   const openInquiry = (product: any) => {
     setInquiryProduct(product)
