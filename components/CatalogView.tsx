@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ShoppingCart, Minus, Plus, X } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, X, Sparkles } from 'lucide-react'
 
 const menuMapping: Record<string, string[]> = {
   plywood: ['century', 'globe', 'sigma'],
@@ -340,7 +340,7 @@ export default function CatalogView({
 
               <div className="px-2 group/filter">
                 <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                  <svg className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h-16" /></svg>
+                  <Sparkles className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" title="Finish Collections" />
                   <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                     <span className="text-sm font-semibold">Finish Types / Categories</span>
                     <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
