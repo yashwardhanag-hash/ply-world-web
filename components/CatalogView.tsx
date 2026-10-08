@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ShoppingCart, Minus, Plus, X, Sparkles } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, X, Sparkles, ShowerHead } from 'lucide-react'
 import laminatesData from '@/data/laminatesData.json'
 
 const menuMapping: Record<string, string[]> = {
@@ -22,6 +22,20 @@ const brandNames: Record<string, string> = {
   sato: 'SATO',
   hepo: 'Hepo',
   vrinda: 'Vrinda',
+}
+
+const sanitarywareTypes = [
+  'Installation System',
+  'Wash Basin',
+  'Faucets',
+  'Faucet Components',
+  'Showering & Thermostatic',
+  'Bathroom Accessories',
+]
+
+const sanitarywareTypeByProduct: Record<string, string> = {
+  'showcase-roca-inspira': 'Installation System',
+  'showcase-sato-basin': 'Wash Basin',
 }
 
 function ThicknessIcon() {
@@ -91,6 +105,7 @@ export default function CatalogView({
   const [selectedSeries, setSelectedSeries] = useState<string>('all')
   const [selectedThickness, setSelectedThickness] = useState<string>('1')
   const [selectedFinish, setSelectedFinish] = useState<string>('all')
+  const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
@@ -157,6 +172,8 @@ export default function CatalogView({
   const finalFilteredProducts = currentCategoryProducts.filter((product: any) => {
     const matchesBrand = selectedBrand === 'all' || product.brands?.slug === selectedBrand
     const matchesSeries = selectedSeries === 'all' || product.series?.slug === selectedSeries
+    const sanitarywareType = product.sanitaryware_type || product.sanitarywareType || sanitarywareTypeByProduct[product.id]
+    const matchesSanitarywareType = selectedCategory !== 'sanitaryware' || selectedSanitarywareType === 'all' || sanitarywareType === selectedSanitarywareType
     const matchesThickness = selectedCategory !== 'laminates' || selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
     const matchesFinish = selectedFinish === 'all' || product.finish_type === selectedFinish || product.product_variants?.some((v: any) => {
       const finish = v.finish_type || v.finish || v.finishType
@@ -165,7 +182,7 @@ export default function CatalogView({
     const matchesSize = selectedSize === 'all' || product.product_variants?.some((v: any) => v.size_ft === selectedSize)
     const matchesSearch = !searchTerm.trim() || `${product.title} ${product.description || ''} ${product.code || ''}`.toLowerCase().includes(searchTerm.trim().toLowerCase())
 
-    return matchesBrand && matchesSeries && matchesThickness && matchesFinish && matchesSize && matchesSearch
+    return matchesBrand && matchesSeries && matchesSanitarywareType && matchesThickness && matchesFinish && matchesSize && matchesSearch
   })
 
   const laminateThicknessOptions = ['1', '0.8']
@@ -197,6 +214,7 @@ export default function CatalogView({
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
   const showLaminateFilters = selectedCategory === 'laminates'
+  const showSanitarywareFilter = selectedCategory === 'sanitaryware'
   const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
 
   const openInquiry = (product: any) => {
@@ -335,6 +353,29 @@ export default function CatalogView({
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Thickness (mm)</span>
                   <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sanitaryware category filter */}
+          {showSanitarywareFilter && (
+            <div className="px-2 group/filter">
+              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                <ShowerHead className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" />
+                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  <span className="text-sm font-semibold">Product Category</span>
+                  <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                  <button type="button" onClick={() => setSelectedSanitarywareType('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSanitarywareType === 'all' ? 'text-cyan-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>All Categories</button>
+                  {sanitarywareTypes.map((type) => (
+                    <button key={type} type="button" onClick={() => setSelectedSanitarywareType(selectedSanitarywareType === type ? 'all' : type)} className={`text-left text-sm py-1.5 font-medium transition-all ${selectedSanitarywareType === type ? 'text-cyan-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
+                      {type}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
