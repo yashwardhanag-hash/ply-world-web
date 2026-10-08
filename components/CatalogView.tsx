@@ -370,19 +370,19 @@ export default function CatalogView({
               </div>
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                 <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
-                  <button type="button" onClick={() => setSelectedSanitarywareType('all')} className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm font-medium transition-all duration-200 ease-out active:scale-[0.98] ${selectedSanitarywareType === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-200 hover:bg-slate-800/70 hover:text-white hover:translate-x-1 hover:shadow-sm'}`}>
-                    <span>All Categories</span>
-                    {selectedSanitarywareType === 'all' && <Check className="h-4 w-4 text-cyan-300" aria-hidden="true" />}
+                  <button type="button" onClick={() => setSelectedSanitarywareType('all')} className="text-left text-sm font-medium text-slate-400 hover:text-white cursor-pointer py-1.5 px-3 rounded-md transition-colors">
+                    All Categories
                   </button>
-                  {sanitarywareTypes.map((type) => {
-                    const isSelected = selectedSanitarywareType === type
-                    return (
-                      <button key={type} type="button" onClick={() => setSelectedSanitarywareType(isSelected ? 'all' : type)} aria-pressed={isSelected} className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm font-medium transition-all ${isSelected ? 'bg-slate-800 text-white' : 'text-slate-200 hover:bg-slate-800/70 hover:text-white hover:translate-x-1'}`}>
-                        <span>{type}</span>
-                        {isSelected && <Check className="h-4 w-4 text-cyan-300" aria-hidden="true" />}
-                      </button>
-                    )
-                  })}
+                  {sanitarywareTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setSelectedSanitarywareType(selectedSanitarywareType === type ? 'all' : type)}
+                      className="text-left text-sm font-medium text-slate-400 hover:text-white cursor-pointer py-1.5 px-3 rounded-md transition-colors"
+                    >
+                      {type}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
