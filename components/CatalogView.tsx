@@ -370,7 +370,11 @@ export default function CatalogView({
               </div>
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                 <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
-                  <button type="button" onClick={() => setSelectedSanitarywareType('all')} className="text-left text-sm font-medium text-slate-400 hover:text-white cursor-pointer py-1.5 px-3 rounded-md transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSanitarywareType('all')}
+                    className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedSanitarywareType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+                  >
                     All Categories
                   </button>
                   {sanitarywareTypes.map((type) => (
@@ -378,7 +382,7 @@ export default function CatalogView({
                       key={type}
                       type="button"
                       onClick={() => setSelectedSanitarywareType(selectedSanitarywareType === type ? 'all' : type)}
-                      className="text-left text-sm font-medium text-slate-400 hover:text-white cursor-pointer py-1.5 px-3 rounded-md transition-colors"
+                      className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedSanitarywareType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
                     >
                       {type}
                     </button>
