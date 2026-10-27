@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ShoppingCart, Minus, Plus, X, Sparkles, ShowerHead, Check } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, X, Sparkles, ShowerHead, Check, Layers } from 'lucide-react'
 import laminatesData from '@/data/laminatesData.json'
 
 const menuMapping: Record<string, string[]> = {
@@ -22,6 +22,18 @@ const brandNames: Record<string, string> = {
   sato: 'SATO',
   hepo: 'Hepo',
   vrinda: 'Vrinda',
+}
+
+const plywoodTypes = [
+  'MR (Moisture Resistant)',
+  'PF (Phenol Formaldehyde / BWP)',
+  'Flush Door',
+  'PVC Board',
+]
+
+const plywoodTypeByProduct: Record<string, string> = {
+  'showcase-century-ply': 'PF (Phenol Formaldehyde / BWP)',
+  'showcase-greenply': 'MR (Moisture Resistant)',
 }
 
 const sanitarywareTypes = [
@@ -106,6 +118,7 @@ export default function CatalogView({
   const [selectedThickness, setSelectedThickness] = useState<string>('1')
   const [selectedFinish, setSelectedFinish] = useState<string>('all')
   const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
+  const [selectedPlywoodType, setSelectedPlywoodType] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
@@ -174,6 +187,8 @@ export default function CatalogView({
     const matchesSeries = selectedSeries === 'all' || product.series?.slug === selectedSeries
     const sanitarywareType = product.sanitaryware_type || product.sanitarywareType || sanitarywareTypeByProduct[product.id]
     const matchesSanitarywareType = selectedCategory !== 'sanitaryware' || selectedSanitarywareType === 'all' || sanitarywareType === selectedSanitarywareType
+    const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
+    const matchesPlywoodType = selectedCategory !== 'plywood' || selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
     const matchesThickness = selectedCategory !== 'laminates' || selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
     const matchesFinish = selectedFinish === 'all' || product.finish_type === selectedFinish || product.product_variants?.some((v: any) => {
       const finish = v.finish_type || v.finish || v.finishType
@@ -182,7 +197,7 @@ export default function CatalogView({
     const matchesSize = selectedSize === 'all' || product.product_variants?.some((v: any) => v.size_ft === selectedSize)
     const matchesSearch = !searchTerm.trim() || `${product.title} ${product.description || ''} ${product.code || ''}`.toLowerCase().includes(searchTerm.trim().toLowerCase())
 
-    return matchesBrand && matchesSeries && matchesSanitarywareType && matchesThickness && matchesFinish && matchesSize && matchesSearch
+    return matchesBrand && matchesSeries && matchesSanitarywareType && matchesPlywoodType && matchesThickness && matchesFinish && matchesSize && matchesSearch
   })
 
   const laminateThicknessOptions = ['1', '0.8']
@@ -213,6 +228,7 @@ export default function CatalogView({
 
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
+  const showPlywoodTypeFilter = selectedCategory === 'plywood'
   const showLaminateFilters = selectedCategory === 'laminates'
   const showSanitarywareFilter = selectedCategory === 'sanitaryware'
   const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
@@ -312,6 +328,34 @@ export default function CatalogView({
               </div>
             </div>
           </div>
+
+          {/* Plywood Type Filter */}
+          {showPlywoodTypeFilter && (
+            <div className="px-2 group/filter">
+              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                <Layers className="w-6 h-6 flex-shrink-0 text-emerald-400 group-hover/filter:text-white transition-colors" aria-hidden="true" />
+                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  <span className="text-sm font-semibold">Type</span>
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
+                  <button type="button" onClick={() => setSelectedPlywoodType('all')} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>All Types</button>
+                  {plywoodTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setSelectedPlywoodType(selectedPlywoodType === type ? 'all' : type)}
+                      className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Size Filter (Only shows for Plywood/Laminates) */}
           {showSizeFilter && (
