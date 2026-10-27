@@ -24,16 +24,11 @@ const brandNames: Record<string, string> = {
   vrinda: 'Vrinda',
 }
 
-const plywoodTypes = [
-  'MR (Moisture Resistant)',
-  'PF (Phenol Formaldehyde / BWP)',
-  'Flush Door',
-  'PVC Board',
-]
+const plywoodTypes = ['MR', 'PF', 'Flush Door', 'PVC Board']
 
 const plywoodTypeByProduct: Record<string, string> = {
-  'showcase-century-ply': 'PF (Phenol Formaldehyde / BWP)',
-  'showcase-greenply': 'MR (Moisture Resistant)',
+  'showcase-century-ply': 'PF',
+  'showcase-greenply': 'MR',
 }
 
 const sanitarywareTypes = [
@@ -341,13 +336,13 @@ export default function CatalogView({
               </div>
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                 <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button type="button" onClick={() => setSelectedPlywoodType('all')} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>All Types</button>
+                  <button type="button" onClick={() => setSelectedPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
                   {plywoodTypes.map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => setSelectedPlywoodType(selectedPlywoodType === type ? 'all' : type)}
-                      className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+                      className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}
                     >
                       {type}
                     </button>
