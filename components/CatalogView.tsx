@@ -1,20 +1,137 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, type FormEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ShoppingCart, Minus, Plus, X, Sparkles, ShowerHead, Check, Layers } from 'lucide-react'
+import laminatesData from '@/data/laminatesData.json'
 
 const menuMapping: Record<string, string[]> = {
-  'plywood': ['centuryply', 'globe', 'sigma'],
-  'laminates': ['aica', 'acrylic'], git config --global user.email "your_email@example.com"
-  'sanitaryware': ['roca', 'sato'],
-  'hardware': ['hepo', 'vrinda']
+  plywood: ['century', 'globe', 'sigma'],
+  laminates: ['aica', 'acrylic'],
+  sanitaryware: ['roca', 'sato'],
+  hardware: ['hepo', 'vrinda'],
+}
+
+const brandNames: Record<string, string> = {
+  century: 'Century',
+  globe: 'Globe',
+  sigma: 'Sigma',
+  aica: 'Aica',
+  acrylic: 'Acrylic',
+  roca: 'Roca',
+  sato: 'SATO',
+  hepo: 'Hepo',
+  vrinda: 'Vrinda',
+}
+
+const plywoodTypes = ['MR', 'PF', 'Flush Door', 'PVC Board']
+
+const plywoodTypeByProduct: Record<string, string> = {
+  'showcase-century-ply': 'PF',
+  'showcase-greenply': 'MR',
+}
+
+const plywoodThicknessesByType: Record<string, string[]> = {
+  all: ['6', '9', '12', '18'],
+  MR: ['6', '9', '12', '18'],
+  PF: ['6', '9', '12', '18'],
+  'PVC Board': ['6', '9', '12', '18'],
+  'Flush Door': ['30'],
+}
+
+const plywoodSizesByType: Record<string, string[]> = {
+  MR: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
+  PF: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
+  'Flush Door': ['72"–78" (Standard)', '80"–84" (Tall)', '88"–92" (Extra Tall)'],
+  'PVC Board': ['8 × 4 ft', '8 × 3 ft'],
+}
+
+const sanitarywareTypes = [
+  'Installation System',
+  'Wash Basin',
+  'Faucets',
+  'Faucet Components',
+  'Showering & Thermostatic',
+  'Bathroom Accessories',
+]
+
+const sanitarywareTypeByProduct: Record<string, string> = {
+  'showcase-roca-inspira': 'Installation System',
+  'showcase-sato-basin': 'Wash Basin',
+}
+
+function DrumPicker({ label, values, selected, onChange }: { label: string; values: number[]; selected: number; onChange: (value: number) => void }) {
+  const wheelRef = useRef<HTMLDivElement>(null)
+  const itemHeight = 40
+
+  useEffect(() => {
+    const wheel = wheelRef.current
+    if (!wheel) return
+    wheel.scrollTo({ top: values.indexOf(selected) * itemHeight, behavior: 'smooth' })
+  }, [selected, values])
+
+  const handleScroll = () => {
+    const wheel = wheelRef.current
+    if (!wheel) return
+    const index = Math.max(0, Math.min(values.length - 1, Math.round(wheel.scrollTop / itemHeight)))
+    if (values[index] !== selected) onChange(values[index])
+  }
+
+  return (
+    <div className="min-w-0 flex-1">
+      <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
+      <div ref={wheelRef} onScroll={handleScroll} className="h-[120px] snap-y snap-mandatory overflow-y-auto overscroll-contain rounded-lg bg-slate-950/40 px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ paddingBlock: 40 }}>
+        {values.map((value) => <button key={value} type="button" onClick={() => onChange(value)} className={`flex h-10 w-full snap-center items-center justify-center border-y border-transparent text-base transition-all duration-200 ${value === selected ? 'border-slate-700 text-lg font-bold text-blue-500' : 'scale-90 text-slate-500'}`}>{value}&quot;</button>)}
+      </div>
+    </div>
+  )
+}
+
+function ThicknessIcon() {
+  return (
+    <svg className="w-6 h-6 flex-shrink-0 text-amber-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+    </svg>
+  )
 }
 
 // 1. DUMMY BANNER DATA (You will replace these images with your actual banners)
 const promotionalBanners = [
   { id: 1, brand: 'all', title: 'The Ultimate Plywood Collection', subtitle: 'Explore our premium range of BWP and MR grade materials.', image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80', tag: 'TRENDING' },
-  { id: 2, brand: 'centuryply', title: 'CenturyPly Sainik 710', subtitle: 'Asli Waterproof Plywood for your interiors.', image: 'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1200&q=80', tag: 'NEW LAUNCH' },
+  { id: 2, brand: 'century', title: 'CenturyPly Sainik 710', subtitle: 'Asli Waterproof Plywood for your interiors.', image: 'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1200&q=80', tag: 'NEW LAUNCH' },
   { id: 3, brand: 'roca', title: 'Roca Inspira Series', subtitle: 'Minimalist sanitaryware for modern bathrooms.', image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1200&q=80', tag: 'PREMIUM' },
 ]
+
+const showcaseProducts = [
+  { id: 'showcase-roca-inspira', title: 'Inspira Wall-Hung WC', description: 'Contemporary rimless toilet with a clean, compact profile.', base_price: 18990, image_urls: ['https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'roca', name: 'Roca' }, categories: { slug: 'sanitaryware', name: 'Sanitaryware' }, product_variants: [{ id: 'roca-specs', size_ft: 'Wall-hung', thickness_mm: null }, { id: 'roca-finish', size_ft: 'Soft-close seat', thickness_mm: null }] },
+  { id: 'showcase-sato-basin', title: 'SATO Countertop Basin', description: 'Elegant ceramic basin with a smooth alpine white finish.', base_price: 7490, image_urls: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'sato', name: 'SATO' }, categories: { slug: 'sanitaryware', name: 'Sanitaryware' }, product_variants: [{ id: 'sato-size', size_ft: '600 × 400 mm', thickness_mm: null }, { id: 'sato-finish', size_ft: 'Alpine white', thickness_mm: null }] },
+  { id: 'showcase-century-ply', title: 'Sainik 710 BWP Plywood', description: 'Boiling waterproof plywood built for dependable interiors.', base_price: 4250, image_urls: ['https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'century', name: 'Century' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'century-thickness', size_ft: '8 × 4 ft', thickness_mm: 18 }, { id: 'century-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
+  { id: 'showcase-greenply', title: 'Green Club Plus Plywood', description: 'Premium calibrated plywood for high-performance cabinetry.', base_price: 5180, image_urls: ['https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'globe', name: 'Globe' }, categories: { slug: 'plywood', name: 'Plywood' }, product_variants: [{ id: 'green-thickness', size_ft: '8 × 4 ft', thickness_mm: 19 }, { id: 'green-grade', size_ft: 'BWP 710', thickness_mm: 12 }] },
+  { id: 'showcase-aica-laminate', title: 'Aica Suede Surface Laminate', description: 'Soft-touch decorative laminate for refined residential interiors.', base_price: 2890, image_urls: ['https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'aica', name: 'Aica' }, categories: { slug: 'laminates', name: 'Laminates' }, product_variants: [{ id: 'aica-thickness', size_ft: '8 × 4 ft', thickness_mm: 1, finish_type: 'SF' }, { id: 'aica-finish', size_ft: '8 × 4 ft', thickness_mm: 1, finish_type: 'Texture' }] },
+  { id: 'showcase-acrylic-laminate', title: 'Acrylic Hi-Gloss Laminate', description: 'Reflective acrylic surface with a durable, easy-clean finish.', base_price: 3490, image_urls: ['https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'acrylic', name: 'Acrylic' }, categories: { slug: 'laminates', name: 'Laminates' }, product_variants: [{ id: 'acrylic-thickness', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Hi-Gloss' }, { id: 'acrylic-finish', size_ft: '8 × 4 ft', thickness_mm: 0.8, finish_type: 'Acrylic' }] },
+  { id: 'showcase-hafele-handle', title: 'Hafele Matrix Cabinet Handle', description: 'Brushed brass architectural hardware for modern joinery.', base_price: 890, image_urls: ['https://images.unsplash.com/photo-1558997519-83ea9252edf8?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'hepo', name: 'Hepo' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'hafele-length', size_ft: '160 mm centre', thickness_mm: null }, { id: 'hafele-finish', size_ft: 'Brushed brass', thickness_mm: null }] },
+  { id: 'showcase-blum-hinge', title: 'Blum Clip-Top Soft-Close Hinge', description: 'Smooth, silent cabinet movement with dependable adjustment.', base_price: 620, image_urls: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85'], brands: { slug: 'vrinda', name: 'Vrinda' }, categories: { slug: 'hardware', name: 'Hardware' }, product_variants: [{ id: 'blum-opening', size_ft: '110° opening', thickness_mm: null }, { id: 'blum-mount', size_ft: 'Full overlay', thickness_mm: null }] },
+  ]
+
+const importedLaminateProducts = laminatesData.map((laminate) => ({
+  id: laminate.id,
+  title: laminate.name,
+  code: laminate.code,
+  description: `${laminate.category} laminate with ${laminate.finishType} finish.`,
+  base_price: laminate.price,
+  currency: laminate.currency,
+  unit: laminate.unit,
+  image_urls: [laminate.image],
+  brands: { slug: 'aica', name: 'Aica' },
+  categories: { slug: 'laminates', name: 'Laminates' },
+  product_variants: laminate.thicknesses.map((thickness, index) => ({
+    id: `${laminate.id}-thickness-${index}`,
+    size_ft: '8 × 4 ft',
+    thickness_mm: Number.parseFloat(thickness),
+    finish_type: laminate.finishCode,
+  })),
+  finish_type: laminate.finishCode,
+}))
 
 export default function CatalogView({
   initialProducts = [],
@@ -36,8 +153,23 @@ export default function CatalogView({
   const [selectedBrand, setSelectedBrand] = useState<string>('all')
   const [selectedSeries, setSelectedSeries] = useState<string>('all')
   const [selectedThickness, setSelectedThickness] = useState<string>('all')
+  const [selectedFinish, setSelectedFinish] = useState<string>('all')
+  const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
+  const [selectedPlywoodType, setSelectedPlywoodType] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
+  const [flushDoorLength, setFlushDoorLength] = useState(84)
+  const [flushDoorWidth, setFlushDoorWidth] = useState(36)
+  const [searchTerm, setSearchTerm] = useState('')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
+  const [inquiryProduct, setInquiryProduct] = useState<any | null>(null)
+  const [detailProduct, setDetailProduct] = useState<any | null>(null)
+  const [isDetailZoomed, setIsDetailZoomed] = useState(false)
+  const [customerName, setCustomerName] = useState('')
+  const [mobileNumber, setMobileNumber] = useState('')
+  const [quantity, setQuantity] = useState('1')
+  const [cartItems, setCartItems] = useState<any[]>([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   // Banner State
   const [currentBannerIdx, setCurrentBannerIdx] = useState(0)
@@ -60,14 +192,30 @@ export default function CatalogView({
     return <div className="py-12 text-center text-slate-500 text-sm">Loading catalog...</div>
   }
 
+  // Use live catalog data when available, with a curated six-card showcase for an empty catalog.
+  const catalogProducts = initialProducts.length > 0
+    ? initialProducts
+    : [...showcaseProducts, ...importedLaminateProducts]
+
   // 1. Get products for current category context
-  const currentCategoryProducts = initialProducts.filter(
+  const currentCategoryProducts = catalogProducts.filter(
     p => selectedCategory === 'all' || p.categories?.slug === selectedCategory
   )
 
   // 2. BI-DIRECTIONAL FILTERING
-  const allPossibleBrands = Array.from(new Set(currentCategoryProducts.map(p => p.brands?.slug))).filter(Boolean) as string[]
-  const allPossibleSizes = Array.from(new Set(currentCategoryProducts.flatMap(p => p.product_variants?.map((v: any) => v.size_ft)))).filter(Boolean) as string[]
+  const allPossibleBrands = selectedCategory === 'all'
+    ? Object.values(menuMapping).flat()
+    : (menuMapping[selectedCategory] || [])
+  const plywoodTypeProducts = currentCategoryProducts.filter((product: any) => {
+    const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
+    return selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
+  })
+  const selectedPlywoodSizes = (selectedCategory === 'all' || selectedCategory === 'plywood')
+    ? selectedPlywoodType === 'all'
+      ? plywoodSizesByType.MR
+      : plywoodSizesByType[selectedPlywoodType] || []
+    : null
+  const allPossibleSizes = selectedPlywoodSizes || Array.from(new Set(currentCategoryProducts.flatMap(p => p.product_variants?.map((v: any) => v.size_ft)))).filter(Boolean) as string[]
 
   const validBrands = new Set(
     currentCategoryProducts
@@ -76,29 +224,112 @@ export default function CatalogView({
   )
 
   const validSizes = new Set(
-    currentCategoryProducts
+    plywoodTypeProducts
       .filter(p => selectedBrand === 'all' || p.brands?.slug === selectedBrand)
       .flatMap(p => p.product_variants?.map((v: any) => v.size_ft))
   )
+  const selectPlywoodType = (type: string) => {
+    setSelectedPlywoodType(type)
+    if (selectedSize !== 'all' && !((plywoodSizesByType[type] || []).includes(selectedSize))) {
+      setSelectedSize('all')
+    }
+    if (selectedThickness !== 'all' && !((plywoodThicknessesByType[type] || plywoodThicknessesByType.all).includes(selectedThickness))) {
+      setSelectedThickness('all')
+    }
+  }
 
   // 3. Final Output
   const finalFilteredProducts = currentCategoryProducts.filter((product: any) => {
     const matchesBrand = selectedBrand === 'all' || product.brands?.slug === selectedBrand
     const matchesSeries = selectedSeries === 'all' || product.series?.slug === selectedSeries
-    const matchesThickness = selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
+    const sanitarywareType = product.sanitaryware_type || product.sanitarywareType || sanitarywareTypeByProduct[product.id]
+    const matchesSanitarywareType = selectedCategory !== 'sanitaryware' || selectedSanitarywareType === 'all' || sanitarywareType === selectedSanitarywareType
+    const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
+    const matchesPlywoodType = selectedCategory !== 'plywood' || selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
+    const matchesThickness = !['laminates', 'plywood'].includes(selectedCategory) || selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
+    const matchesFinish = selectedFinish === 'all' || product.finish_type === selectedFinish || product.product_variants?.some((v: any) => {
+      const finish = v.finish_type || v.finish || v.finishType
+      return finish?.toLowerCase() === selectedFinish.toLowerCase()
+    })
     const matchesSize = selectedSize === 'all' || product.product_variants?.some((v: any) => v.size_ft === selectedSize)
-    
-    return matchesBrand && matchesSeries && matchesThickness && matchesSize
+    const matchesSearch = !searchTerm.trim() || `${product.title} ${product.description || ''} ${product.code || ''}`.toLowerCase().includes(searchTerm.trim().toLowerCase())
+
+    return matchesBrand && matchesSeries && matchesSanitarywareType && matchesPlywoodType && matchesThickness && matchesFinish && matchesSize && matchesSearch
   })
+
+  const laminateThicknessOptions = ['1', '0.8']
+  const laminateFinishGroups = [
+    {
+      title: 'Woodgrains',
+      finishes: [
+        { label: 'Woodgrain Matt / Velvet Finish (WM)', value: 'WM', thicknesses: ['1'] },
+        { label: 'Real Wood Finish (REW)', value: 'REW', thicknesses: ['1', '0.8'] },
+        { label: 'Deep Matt Finish (DM)', value: 'DM', thicknesses: ['1'] },
+        { label: 'Art Wood Finish (AW)', value: 'AW', thicknesses: ['0.8'] },
+      ],
+    },
+    {
+      title: 'Abstracts & Stones',
+      finishes: [
+        { label: 'Plush Leather / Matt Finish (PL)', value: 'PL', thicknesses: ['1', '0.8'] },
+        { label: 'Linear Wood / Texture Finish (LW)', value: 'LW', thicknesses: ['0.8'] },
+        { label: 'Deep Matt Finish (DM)', value: 'DM', thicknesses: ['1'] },
+        { label: 'Fabric Finish (FAB)', value: 'FAB', thicknesses: ['1', '0.8'] },
+      ],
+    },
+    { title: 'New Textures', finishes: [{ label: 'Mono Line Finish (ML)', value: 'ML', thicknesses: ['0.8'] }] },
+    { title: 'Premium Veltouch Collection', finishes: [{ label: 'Matt / Anti-Fingerprint Finish (VEL)', value: 'VEL', thicknesses: ['1'] }] },
+    { title: 'Luce Shimmer Collection', finishes: [{ label: 'Shimmer Finish (SHM)', value: 'SHM', thicknesses: ['0.8'] }] },
+  ]
+  const laminateFinishOptions = laminateFinishGroups.flatMap((group) => group.finishes)
 
   // Dynamic Sidebar visibility based on Category
   const showThicknessFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
-  const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood' || selectedCategory === 'laminates'
+  const showPlywoodTypeFilter = selectedCategory === 'plywood'
+  const showLaminateFilters = selectedCategory === 'laminates'
+  const showSanitarywareFilter = selectedCategory === 'sanitaryware'
+  const showSizeFilter = selectedCategory === 'all' || selectedCategory === 'plywood'
 
-  const handleWhatsApp = (title: string, brandName?: string) => {
-    const phone = '919876543210' 
-    const text = encodeURIComponent(`Hello PLY WORLD! I would like to get pricing for:\n*Product:* ${title}\n*Brand:* ${brandName || 'Standard'}`)
-    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${text}`, '_blank')
+  const openInquiry = (product: any) => {
+    setInquiryProduct(product)
+    setCustomerName('')
+    setMobileNumber('')
+    setQuantity('1')
+  }
+
+  const addToCart = (product: any) => {
+    setCartItems((current) => {
+      const existing = current.find((item) => item.id === product.id)
+      if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
+      return [...current, { product, quantity: 1 }]
+    })
+  }
+
+  const updateCartQuantity = (productId: string, delta: number) => {
+    setCartItems((current) => current.flatMap((item) => {
+      if (item.product.id !== productId) return [item]
+      const quantity = item.quantity + delta
+      return quantity > 0 ? [{ ...item, quantity }] : []
+    }))
+  }
+
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+
+  const checkoutCart = () => {
+    if (!cartItems.length) return
+    const lines = cartItems.map((item, index) => `${index + 1}. ${item.product.brands?.name || 'Standard'} ${item.product.title} - Qty: ${item.quantity}`)
+    const text = encodeURIComponent(`Hello Rival Team, I would like to inquire about the following order:\n${lines.join('\n')}\nTotal Items: ${cartCount}\nPlease share availability and final invoice link.`)
+    window.open(`https://wa.me/919876543210?text=${text}`, '_blank', 'noopener,noreferrer')
+  }
+
+  const submitInquiry = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!inquiryProduct) return
+
+    const phone = '919876543210'
+    const text = encodeURIComponent(`Hello PLY WORLD! I would like to place an inquiry.\n*Customer:* ${customerName}\n*Mobile:* ${mobileNumber}\n*Product:* ${inquiryProduct.title}\n*Brand:* ${inquiryProduct.brands?.name || 'Standard'}\n*Quantity:* ${quantity}`)
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener,noreferrer')
+    setInquiryProduct(null)
   }
 
   return (
@@ -147,13 +378,41 @@ export default function CatalogView({
                       disabled={!isValid}
                       className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedBrand === brandSlug ? 'text-blue-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}
                     >
-                      {brandObj?.name || brandSlug}
+                      {brandObj?.name || brandNames[brandSlug] || brandSlug}
                     </button>
                   )
                 })}
               </div>
             </div>
           </div>
+
+          {/* Plywood Type Filter */}
+          {showPlywoodTypeFilter && (
+            <div className="px-2 group/filter">
+              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                <Layers className="w-6 h-6 flex-shrink-0 text-emerald-400 group-hover/filter:text-white transition-colors" aria-hidden="true" />
+                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  <span className="text-sm font-semibold">Type</span>
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
+                  <button type="button" onClick={() => selectPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
+                  {plywoodTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => selectPlywoodType(selectedPlywoodType === type ? 'all' : type)}
+                      className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Size Filter (Only shows for Plywood/Laminates) */}
           {showSizeFilter && (
@@ -167,92 +426,231 @@ export default function CatalogView({
               </div>
 
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
-                  {allPossibleSizes.map(size => {
-                    const isValid = validSizes.has(size)
-                    return (
-                      <button
-                        key={size}
-                        onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)}
-                        disabled={!isValid}
-                        className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}
-                      >
-                        {size}
-                      </button>
-                    )
-                  })}
+                <div className="pl-12 pr-4 py-2 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                  {selectedPlywoodType === 'Flush Door' ? (
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <DrumPicker label="Length (Inches)" values={Array.from({ length: 25 }, (_, index) => index + 72)} selected={flushDoorLength} onChange={setFlushDoorLength} />
+                        <DrumPicker label="Width (Inches)" values={Array.from({ length: 25 }, (_, index) => index + 24)} selected={flushDoorWidth} onChange={setFlushDoorWidth} />
+                      </div>
+                      <p className="border-t border-slate-800 pt-3 text-center text-xs font-medium text-slate-300">Selected: {flushDoorLength}&quot; × {flushDoorWidth}&quot; ({Number((flushDoorLength / 12).toFixed(2))} × {Number((flushDoorWidth / 12).toFixed(2))} ft)</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-1">
+                      <button type="button" onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
+                      {allPossibleSizes.map(size => {
+                        const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
+                        return <button key={size} type="button" onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)} disabled={!isValid} className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}>{size}</button>
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Thickness Filter (Only shows for Plywood) */}
+          {/* Thickness Filter */}
           {showThicknessFilter && (
             <div className="px-2 group/filter">
               <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                <svg className="w-6 h-6 flex-shrink-0 text-amber-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                <ThicknessIcon />
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Thickness (mm)</span>
-                  <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 flex flex-col gap-1">
+                  <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Thicknesses</button>
+                  {(selectedCategory === 'plywood' ? (plywoodThicknessesByType[selectedPlywoodType] || plywoodThicknessesByType.all) : plywoodThicknessesByType.all).map((thickness) => (
+                    <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === thickness ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{thickness} mm</button>
+                  ))}
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Sanitaryware category filter */}
+          {showSanitarywareFilter && (
+            <div className="px-2 group/filter">
+              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                <ShowerHead className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" />
+                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  <span className="text-sm font-semibold">Product Category</span>
+                  <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-96 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSanitarywareType('all')}
+                    className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedSanitarywareType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+                  >
+                    All Categories
+                  </button>
+                  {sanitarywareTypes.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setSelectedSanitarywareType(selectedSanitarywareType === type ? 'all' : type)}
+                      className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedSanitarywareType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Laminate-specific filters */}
+          {showLaminateFilters && (
+            <>
+              <div className="px-2 group/filter">
+                <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                  <ThicknessIcon />
+                  <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                    <span className="text-sm font-semibold">Thickness (mm)</span>
+                    <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
+                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                    {laminateThicknessOptions.map((thickness) => (
+                      <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === thickness ? 'text-amber-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
+                        {thickness} mm
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-2 group/filter">
+                <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                  <Sparkles className="w-6 h-6 flex-shrink-0 text-cyan-300 group-hover/filter:text-white transition-colors" aria-hidden="true" />
+                  <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                    <span className="text-sm font-semibold">Finish Types / Categories</span>
+                    <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
+                <div className="overflow-hidden max-h-0 group-hover/filter:max-h-[32rem] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                  <div className="pl-12 pr-3 py-2 flex flex-col gap-2 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-xs font-semibold transition-colors ${selectedFinish === 'all' ? 'text-cyan-300' : 'text-slate-400 hover:text-white'}`}>All finishes</button>
+                    {laminateFinishGroups.map((group) => (
+                      <details key={group.title} className="group/finish rounded-lg border border-slate-800/80 bg-slate-950/30" open>
+                        <summary className="flex cursor-pointer list-none items-center justify-between px-2 py-2 text-xs font-semibold text-slate-200 hover:text-white">
+                          {group.title}
+                          <span className="text-slate-500 transition-transform group-open/finish:rotate-180">⌄</span>
+                        </summary>
+                        <div className="flex flex-col gap-1 px-2 pb-2">
+                          {group.finishes.map((finish) => {
+                            const available = finish.thicknesses.includes(selectedThickness === 'all' ? '1' : selectedThickness)
+                            const selected = selectedFinish === finish.value
+                            return (
+                              <button key={`${group.title}-${finish.value}`} type="button" disabled={!available} onClick={() => setSelectedFinish(selected ? 'all' : finish.value)} className={`rounded-md px-2 py-1.5 text-left text-[11px] font-medium transition-all ${available ? selected ? 'bg-cyan-400/15 text-cyan-200' : 'text-slate-300 hover:bg-white/10 hover:text-white' : 'cursor-not-allowed text-slate-600 opacity-40'}`}>
+                                {finish.label}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </aside>
 
       {/* TOP NAVIGATION */}
-      <nav className="flex flex-wrap gap-4 pb-4 border-b border-slate-200 relative z-50">
-        <button
-          onClick={() => {
-            setSelectedCategory('all'); setSelectedBrand('all'); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all');
-          }}
-          className={`h-11 px-5 rounded-[22px] text-sm font-bold transition-all shadow-sm flex items-center ${selectedCategory === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
-        >
-          All Products
-        </button>
-
-        {categories.map((cat: any) => {
-          const allowedBrandSlugs = menuMapping[cat.slug] || []
-          const categoryBrands = brands.filter(b => allowedBrandSlugs.includes(b.slug))
-          const isActive = selectedCategory === cat.slug
-
+      <nav className="relative z-50 flex flex-wrap items-start gap-2 pb-4 border-b border-slate-200">
+        {[
+          { label: 'All Products', slug: 'all', items: [] },
+          { label: 'Plywood', slug: 'plywood', items: ['Century', 'Globe', 'Sigma'] },
+          { label: 'Laminates', slug: 'laminates', items: ['Aica', 'Acrylic'] },
+          { label: 'Sanitaryware', slug: 'sanitaryware', items: ['Roca', 'SATO'] },
+          { label: 'Hardware', slug: 'hardware', items: ['Hepo', 'Vrinda'] },
+        ].map((item) => {
+          const isActive = selectedCategory === item.slug
+          const hasDropdown = item.items.length > 0
+          const isOpen = openMenu === item.slug
           return (
-            <div key={cat.id} className="relative group z-50 cursor-pointer">
-              <div className="h-11 px-5 flex items-center gap-2 text-sm font-bold opacity-0 pointer-events-none whitespace-nowrap">
-                {cat.name}
-                {categoryBrands.length > 0 && <svg className="w-4 h-4" />}
-              </div>
-
-              <div className={`absolute top-0 left-0 min-w-full bg-white border ${isActive ? 'border-blue-400' : 'border-slate-200'} rounded-[22px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] max-h-11 group-hover:max-h-[400px] flex flex-col z-50`}>
-                <button
-                  onClick={() => { setSelectedCategory(cat.slug); setSelectedBrand('all'); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all'); }}
-                  className={`h-[42px] px-5 w-full flex items-center pt-[10px] gap-2 text-sm font-bold transition-colors whitespace-nowrap ${isActive ? 'text-blue-600' : 'text-slate-700 group-hover:text-blue-600'}`}
+            <motion.div key={item.slug} layout className="relative">
+              <motion.button
+                type="button"
+                layout
+                onHoverStart={() => hasDropdown && setOpenMenu(item.slug)}
+                onClick={() => {
+                  setSelectedCategory(item.slug)
+                  setSelectedBrand('all')
+                  setSelectedSeries('all')
+                  setSelectedThickness(item.slug === 'laminates' ? '1' : 'all')
+                  setSelectedFinish('all')
+                  setSelectedSize('all')
+                  if (hasDropdown) setOpenMenu(isOpen ? null : item.slug)
+                }}
+                className={`flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors hover:bg-slate-50 ${isActive ? 'ring-2 ring-slate-200 ring-offset-1' : ''}`}
+              >
+                {item.label}
+                {hasDropdown && <span className={`text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>⌄</span>}
+              </motion.button>
+              {hasDropdown && isOpen && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scaleY: 0.85, transformOrigin: 'top' }}
+                  animate={{ opacity: 1, scaleY: 1 }}
+                  exit={{ opacity: 0, scaleY: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+                  onMouseLeave={() => setOpenMenu(null)}
+                  className="absolute left-0 top-full mt-1 min-w-[190px] rounded-3xl border border-slate-200 bg-white p-3 shadow-xl"
                 >
-                  {cat.name}
-                  {categoryBrands.length > 0 && <svg className="w-4 h-4 opacity-50 group-hover:rotate-180 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>}
-                </button>
-
-                {categoryBrands.length > 0 && (
-                  <div className="flex flex-col pb-3 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                    <div className="mx-4 mb-2 border-t border-slate-100"></div>
-                    {categoryBrands.map((brand: any) => (
-                      <button
-                        key={brand.id}
-                        onClick={(e) => { e.stopPropagation(); setSelectedCategory(cat.slug); setSelectedBrand(brand.slug); setSelectedSeries('all'); setSelectedThickness('all'); setSelectedSize('all'); }}
-                        className="w-full text-left px-5 py-2.5 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-all duration-300 ease-out hover:translate-x-2 whitespace-nowrap"
-                      >
-                        {brand.name}
-                      </button>
+                  <div className="space-y-1">
+                    {item.items.map((brand) => (
+                      <button key={brand} type="button" onClick={() => { setSelectedCategory(item.slug); setSelectedBrand(brand.toLowerCase()); setOpenMenu(null) }} className="block w-full rounded-lg border border-slate-200/60 bg-slate-50 p-2 text-left text-sm font-medium text-slate-900 transition-all duration-200 ease-out hover:translate-x-1 hover:border-l-4 hover:border-l-blue-500 hover:bg-slate-100 hover:shadow-sm">{brand}</button>
                     ))}
                   </div>
-                )}
-              </div>
-            </div>
+                </motion.div>
+              )}
+            </motion.div>
           )
         })}
+        <button type="button" onClick={() => setIsCartOpen(true)} className="ml-auto flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700" aria-label={`Open cart, ${cartCount} items`}>
+          <ShoppingCart className="h-4 w-4" /> Cart <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs">{cartCount}</span>
+        </button>
       </nav>
+
+      {showLaminateFilters && (
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-4">
+          <label className="relative min-w-[240px] flex-1">
+            <span className="sr-only">Search laminates</span>
+            <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search code or design name, e.g. WP 274" className="w-full rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-100" />
+          </label>
+          <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1" aria-label="Laminate thickness">
+            {laminateThicknessOptions.map((thickness) => (
+              <button key={thickness} type="button" onClick={() => setSelectedThickness(thickness)} className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${selectedThickness === thickness ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-white'}`}>{thickness} mm</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showLaminateFilters && (selectedThickness !== 'all' || selectedFinish !== 'all' || searchTerm) && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Active filters</span>
+          {selectedThickness !== 'all' && (
+            <button type="button" onClick={() => setSelectedThickness('all')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200">
+              {selectedThickness} mm <X className="h-3 w-3" />
+            </button>
+          )}
+          {selectedFinish !== 'all' && (
+            <button type="button" onClick={() => setSelectedFinish('all')} className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-800 transition-colors hover:bg-cyan-100">
+              {laminateFinishOptions.find((finish) => finish.value === selectedFinish)?.label || selectedFinish} <X className="h-3 w-3" />
+            </button>
+          )}
+          <button type="button" onClick={() => { setSelectedThickness('all'); setSelectedFinish('all'); setSearchTerm('') }} className="text-xs font-semibold text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline">Clear all</button>
+        </div>
+      )}
 
       {/* 
         =====================================================================
@@ -294,44 +692,26 @@ export default function CatalogView({
           {/* 
             NETFLIX STYLE STRIPS (When No Brand is Selected)
           */}
-          {selectedBrand === 'all' && selectedCategory !== 'all' ? (
+          {selectedCategory === 'laminates' && selectedBrand === 'all' && selectedFinish === 'all' && !searchTerm.trim() ? (
             <div className="space-y-10">
-              {allPossibleBrands.map(brandSlug => {
-                const brandObj = brands.find(b => b.slug === brandSlug)
-                const productsInStrip = finalFilteredProducts.filter(p => p.brands?.slug === brandSlug)
-                
+              {laminateFinishGroups.map((group) => {
+                const productsInStrip = finalFilteredProducts.filter((product: any) => product.product_variants?.some((variant: any) => group.finishes.some((finish) => finish.value === (variant.finish_type || variant.finish || variant.finishType))))
                 if (productsInStrip.length === 0) return null
-
                 return (
-                  <div key={brandSlug} className="space-y-4">
+                  <section key={group.title} className="space-y-4">
                     <div className="flex items-end justify-between">
-                      <h3 className="text-xl font-extrabold text-slate-800">{brandObj?.name || brandSlug} Collection</h3>
-                      <button onClick={() => setSelectedBrand(brandSlug)} className="text-sm font-bold text-blue-600 hover:text-blue-700">View All →</button>
+                      <div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-600">AICA Laminates</p><h3 className="text-xl font-extrabold text-slate-800">{group.title}</h3></div>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{productsInStrip.length} designs</span>
                     </div>
-                    
-                    {/* Horizontal Scroller */}
-                    <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory hide-scrollbar">
+                    <div className="relative flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar">
                       {productsInStrip.map((item: any) => (
-                        <div key={item.id} className="min-w-[280px] w-[280px] snap-start bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300 flex-shrink-0">
-                          {/* Card Content (Same as Grid) */}
-                          <div className="h-40 bg-slate-100 relative overflow-hidden group/img">
-                            <img src={item.image_urls?.[0] || 'https://via.placeholder.com/400'} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"/>
-                            {item.series?.name && <span className="absolute top-3 right-3 bg-blue-600/95 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded shadow-sm">{item.series.name}</span>}
-                          </div>
-                          <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                              <span className="text-[10px] uppercase tracking-widest font-black text-slate-500">{item.brands?.name || 'Standard'}</span>
-                              <h3 className="text-sm font-bold text-slate-900 mt-1 leading-snug truncate">{item.title}</h3>
-                            </div>
-                            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                              <span className="text-sm font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                              <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded transition hover:bg-emerald-600">Inquire</button>
-                            </div>
-                          </div>
-                        </div>
+                        <button type="button" key={item.id} onClick={() => { setDetailProduct(item); setIsDetailZoomed(false) }} className="group min-w-[260px] w-[260px] cursor-pointer snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-transform duration-200 hover:scale-105 hover:shadow-xl">
+                          <div className="relative h-40 overflow-hidden bg-slate-100"><img src={item.image_urls?.[0]} alt={`${item.title} laminate swatch`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" /><span className="absolute bottom-3 left-3 rounded-full bg-slate-950/75 px-3 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">View Full Preview</span></div>
+                          <div className="p-4"><div className="flex items-center justify-between gap-2"><span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.code || item.brands?.name || 'AICA'}</span><span className="rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-700">{item.product_variants?.[0]?.finish_type || 'Laminate'}</span></div><h4 className="mt-2 text-sm font-bold text-slate-900">{item.title}</h4><p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{item.description}</p><div className="mt-3"><span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Starting Price</span><p className="text-sm font-extrabold text-emerald-600">{item.base_price ? `${item.currency || '₹'} ${item.base_price.toLocaleString('en-IN')} / ${item.unit || 'sheet'}` : 'Contact for Price'}</p></div></div>
+                        </button>
                       ))}
                     </div>
-                  </div>
+                  </section>
                 )
               })}
             </div>
@@ -341,10 +721,11 @@ export default function CatalogView({
             */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {finalFilteredProducts.map((item: any) => (
-                <div key={item.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
+                <div key={item.id} onClick={() => item.categories?.slug === 'laminates' && (setDetailProduct(item), setIsDetailZoomed(false))} className={`group bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300 ${item.categories?.slug === 'laminates' ? 'cursor-pointer' : ''}`}>
                   <div className="h-48 bg-slate-100 relative overflow-hidden group/img">
                     <img src={item.image_urls?.[0] || 'https://via.placeholder.com/400'} alt={item.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
                     <span className="absolute top-3 left-3 bg-slate-900/90 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded backdrop-blur-sm shadow-sm">{item.categories?.name}</span>
+                    {item.categories?.slug === 'laminates' && <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/75 px-3 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">View Full Preview</span>}
                     {item.series?.name && <span className="absolute top-3 right-3 bg-blue-600/95 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded shadow-sm">{item.series.name}</span>}
                   </div>
                   <div className="p-5 flex-1 flex flex-col justify-between">
@@ -365,12 +746,13 @@ export default function CatalogView({
                         </div>
                       )}
                     </div>
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Starting Price</span>
-                        <span className="text-lg font-black text-slate-900">₹{item.base_price?.toLocaleString('en-IN')}</span>
-                      </div>
-                      <button onClick={() => handleWhatsApp(item.title, item.brands?.name)} className="bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-all shadow-sm">Inquire Now</button>
+                    <div className="mt-2 mb-3">
+                      <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium block">Starting Price</span>
+                      <span className="text-lg font-bold text-emerald-600">{item.base_price ? `${item.currency || '₹'}${item.base_price.toLocaleString('en-IN')} / ${item.unit || 'sheet'}` : 'Contact for Price'}</span>
+                    </div>
+                    <div className="w-full flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                      <button onClick={() => addToCart(item)} className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:border-slate-900 hover:bg-slate-900 hover:text-white hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-100 active:bg-slate-800">Add to Cart</button>
+                      <button onClick={() => openInquiry(item)} className="flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 ease-out hover:scale-[1.02] hover:bg-emerald-500 hover:shadow-md hover:shadow-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:scale-100 active:bg-emerald-700">Inquire via WhatsApp</button>
                     </div>
                   </div>
                 </div>
@@ -385,6 +767,62 @@ export default function CatalogView({
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCartOpen(false)} className="fixed inset-0 z-[90] bg-slate-950/40 backdrop-blur-sm" />
+            <motion.aside initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 360, damping: 35 }} className="fixed right-0 top-0 z-[100] flex h-full w-full max-w-md flex-col bg-white p-6 text-slate-900 shadow-2xl" aria-label="Shopping cart">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4"><div><p className="text-xs font-bold uppercase tracking-widest text-blue-600">Your order</p><h2 className="text-2xl font-extrabold">Cart <span className="text-slate-400">({cartCount})</span></h2></div><button type="button" onClick={() => setIsCartOpen(false)} aria-label="Close cart" className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100"><X className="h-5 w-5" /></button></div>
+              <div className="flex-1 space-y-4 overflow-y-auto py-5">
+                {cartItems.length === 0 ? <p className="py-12 text-center text-sm text-slate-500">Your cart is empty.</p> : cartItems.map(({ product, quantity }) => (
+                  <div key={product.id} className="flex gap-3 rounded-xl border border-slate-200 p-3"><img src={product.image_urls?.[0]} alt="" className="h-16 w-16 rounded-lg object-cover" /><div className="min-w-0 flex-1"><p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{product.brands?.name || 'Standard'}</p><p className="truncate text-sm font-bold">{product.title}</p><div className="mt-2 flex items-center justify-between"><div className="flex items-center gap-2 rounded-lg border border-slate-200 px-1"><button type="button" onClick={() => updateCartQuantity(product.id, -1)} aria-label={`Decrease ${product.title}`} className="p-1 text-slate-500 hover:text-slate-900"><Minus className="h-3 w-3" /></button><span className="min-w-5 text-center text-xs font-bold">{quantity}</span><button type="button" onClick={() => updateCartQuantity(product.id, 1)} aria-label={`Increase ${product.title}`} className="p-1 text-slate-500 hover:text-slate-900"><Plus className="h-3 w-3" /></button></div><span className="text-sm font-extrabold">₹{product.base_price?.toLocaleString('en-IN')}</span></div></div></div>
+                ))}
+              </div>
+              <button type="button" disabled={!cartItems.length} onClick={checkoutCart} className="w-full rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40">Inquire Whole Cart on WhatsApp</button>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {inquiryProduct && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setInquiryProduct(null)}>
+          <div role="dialog" aria-modal="true" aria-labelledby="inquiry-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Product inquiry</p>
+                <h2 id="inquiry-title" className="mt-1 text-xl font-extrabold text-slate-900">{inquiryProduct.title}</h2>
+                <p className="mt-1 text-sm text-slate-500">Share your details and we&apos;ll continue on WhatsApp.</p>
+              </div>
+              <button type="button" aria-label="Close inquiry form" onClick={() => setInquiryProduct(null)} className="rounded-full p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button>
+            </div>
+
+            <form onSubmit={submitInquiry} className="space-y-4">
+              <label className="block text-sm font-semibold text-slate-700">Customer Name
+                <input required value={customerName} onChange={(event) => setCustomerName(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="Your full name" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-700">Mobile Number
+                <input required type="tel" inputMode="tel" pattern="[0-9+()\- ]{7,}" value={mobileNumber} onChange={(event) => setMobileNumber(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="e.g. 9876543210" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-700">Quantity
+                <input required type="number" min="1" step="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+              </label>
+              <button type="submit" className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2">Continue to WhatsApp</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {detailProduct && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setDetailProduct(null)}>
+          <div role="dialog" aria-modal="true" aria-labelledby="laminate-detail-title" className="w-full max-w-3xl overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl">
+            <div className="grid md:grid-cols-2">
+              <div className="group/preview relative min-h-64 overflow-hidden bg-slate-100 md:min-h-[420px]"><img src={detailProduct.image_urls?.[0]} alt={`${detailProduct.title} full laminate preview`} className={`h-full w-full object-cover transition-transform duration-500 ${isDetailZoomed ? 'scale-150' : 'scale-100'}`} /><button type="button" onClick={() => setIsDetailZoomed((zoomed) => !zoomed)} className="absolute bottom-4 left-4 rounded-full bg-slate-950/75 px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-950">{isDetailZoomed ? 'Reset Preview' : 'Zoom Preview'}</button></div>
+              <div className="p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-widest text-cyan-600">{detailProduct.categories?.name || 'Laminates'}</p><p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{detailProduct.code || detailProduct.brands?.name}</p><h2 id="laminate-detail-title" className="mt-1 text-2xl font-extrabold">{detailProduct.title}</h2></div><button type="button" onClick={() => setDetailProduct(null)} aria-label="Close details" className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button></div><p className="mt-3 text-sm leading-relaxed text-slate-600">{detailProduct.description}</p><p className="mt-5 text-xl font-extrabold text-emerald-600">{detailProduct.base_price ? `${detailProduct.currency || '₹'} ${detailProduct.base_price.toLocaleString('en-IN')} / ${detailProduct.unit || 'sheet'}` : 'Contact for Price'}</p><div className="mt-5"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Finish Type</p><p className="mt-1 text-sm font-semibold text-slate-800">{detailProduct.finishType || detailProduct.description}</p></div><div className="mt-5"><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Available Thickness</p><div className="mt-2 flex flex-wrap gap-2">{detailProduct.product_variants?.map((variant: any) => <span key={variant.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{variant.thickness_mm} mm</span>)}</div></div><div className="mt-6 flex flex-col gap-2 sm:flex-row"><button type="button" onClick={() => { setDetailProduct(null); openInquiry(detailProduct) }} className="flex-1 rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700">Inquire Now</button><button type="button" onClick={() => { addToCart(detailProduct); setDetailProduct(null) }} className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 transition hover:bg-slate-100">Add to Quote</button></div></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
