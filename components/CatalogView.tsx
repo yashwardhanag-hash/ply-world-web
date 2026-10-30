@@ -363,79 +363,25 @@ export default function CatalogView({
             <div className="px-2 group/filter">
               <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
                 <Layers className="w-6 h-6 flex-shrink-0 text-emerald-400 group-hover/filter:text-white transition-colors" aria-hidden="true" />
-                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                  <span className="text-sm font-semibold">Type</span>
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </div>
+                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"><span className="text-sm font-semibold">Type</span><svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg></div>
               </div>
-              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button type="button" onClick={() => selectPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
-                  {plywoodTypes.map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => selectPlywoodType(selectedPlywoodType === type ? 'all' : type)}
-                      className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"><div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
+                <button type="button" onClick={() => selectPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
+                {plywoodTypes.map((type) => <button key={type} type="button" onClick={() => selectPlywoodType(selectedPlywoodType === type ? 'all' : type)} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{type}</button>)}
+              </div></div>
             </div>
           )}
 
-          {/* Size Filter (Only shows for Plywood/Laminates) */}
-          {showSizeFilter && (
+          {/* Plywood Thickness Filter */}
+          {showPlywoodTypeFilter && (
             <div className="px-2 group/filter">
-              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                <svg className="w-6 h-6 flex-shrink-0 text-purple-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                  <span className="text-sm font-semibold">Dimensions & Sizes</span>
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-
-              <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
-                  {allPossibleSizes.map(size => {
-                    const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
-                    return (
-                      <button
-                        key={size}
-                        onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)}
-                        disabled={!isValid}
-                        className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}
-                      >
-                        {size}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Thickness Filter */}
-          {showThicknessFilter && (
-            <div className="px-2 group/filter">
-              <button type="button" onClick={() => setIsThicknessOpen((open) => !open)} aria-expanded={isThicknessOpen} className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer text-left">
-                <ThicknessIcon />
-                <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                  <span className="text-sm font-semibold">Thickness (mm)</span>
-                  <svg className={`w-4 h-4 opacity-50 transition-transform duration-300 ${isThicknessOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </div>
+              <button type="button" onClick={() => setOpenSidebarFilter(openSidebarFilter === 'thickness' ? null : 'thickness')} aria-expanded={openSidebarFilter === 'thickness'} className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer text-left">
+                <ThicknessIcon /><div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap"><span className="text-sm font-semibold">Thickness (mm)</span><svg className={`w-4 h-4 opacity-50 transition-transform duration-300 ${openSidebarFilter === 'thickness' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg></div>
               </button>
-              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isThicknessOpen ? 'max-h-64' : 'max-h-0'}`}>
-                <div className="pl-12 pr-4 py-2 flex flex-col gap-1">
-                  <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Thicknesses</button>
-                  {(selectedCategory === 'plywood' ? (plywoodThicknessesByType[selectedPlywoodType] || plywoodThicknessesByType.all) : plywoodThicknessesByType.all).map((thickness) => (
-                    <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === thickness ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{thickness} mm</button>
-                  ))}
-                </div>
-              </div>
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openSidebarFilter === 'thickness' ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}><div className="pl-12 pr-4 py-2 flex flex-col gap-1">
+                <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Thicknesses</button>
+                {(plywoodThicknessesByType[selectedPlywoodType] || plywoodThicknessesByType.all).map((thickness) => <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === thickness ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{thickness} mm</button>)}
+              </div></div>
             </div>
           )}
 
