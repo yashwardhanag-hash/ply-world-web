@@ -31,6 +31,14 @@ const plywoodTypeByProduct: Record<string, string> = {
   'showcase-greenply': 'MR',
 }
 
+const plywoodThicknessesByType: Record<string, string[]> = {
+  all: ['6', '9', '12', '18'],
+  MR: ['6', '9', '12', '18'],
+  PF: ['6', '9', '12', '18'],
+  'PVC Board': ['6', '9', '12', '18'],
+  'Flush Door': ['30'],
+}
+
 const plywoodSizesByType: Record<string, string[]> = {
   MR: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
   PF: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
@@ -117,7 +125,7 @@ export default function CatalogView({
   const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategory) // <--- 3. We changed 'all' to defaultCategory
   const [selectedBrand, setSelectedBrand] = useState<string>('all')
   const [selectedSeries, setSelectedSeries] = useState<string>('all')
-  const [selectedThickness, setSelectedThickness] = useState<string>('1')
+  const [selectedThickness, setSelectedThickness] = useState<string>('all')
   const [selectedFinish, setSelectedFinish] = useState<string>('all')
   const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
   const [selectedPlywoodType, setSelectedPlywoodType] = useState<string>('all')
@@ -196,6 +204,9 @@ export default function CatalogView({
     if (selectedSize !== 'all' && !((plywoodSizesByType[type] || []).includes(selectedSize))) {
       setSelectedSize('all')
     }
+    if (selectedThickness !== 'all' && !((plywoodThicknessesByType[type] || plywoodThicknessesByType.all).includes(selectedThickness))) {
+      setSelectedThickness('all')
+    }
   }
 
   // 3. Final Output
@@ -206,7 +217,7 @@ export default function CatalogView({
     const matchesSanitarywareType = selectedCategory !== 'sanitaryware' || selectedSanitarywareType === 'all' || sanitarywareType === selectedSanitarywareType
     const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
     const matchesPlywoodType = selectedCategory !== 'plywood' || selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
-    const matchesThickness = selectedCategory !== 'laminates' || selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
+    const matchesThickness = !['laminates', 'plywood'].includes(selectedCategory) || selectedThickness === 'all' || product.product_variants?.some((v: any) => v.thickness_mm?.toString() === selectedThickness)
     const matchesFinish = selectedFinish === 'all' || product.finish_type === selectedFinish || product.product_variants?.some((v: any) => {
       const finish = v.finish_type || v.finish || v.finishType
       return finish?.toLowerCase() === selectedFinish.toLowerCase()
@@ -406,14 +417,22 @@ export default function CatalogView({
             </div>
           )}
 
-          {/* Thickness Filter (Only shows for Plywood) */}
+          {/* Thickness Filter */}
           {showThicknessFilter && (
             <div className="px-2 group/filter">
               <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
                 <ThicknessIcon />
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Thickness (mm)</span>
-                  <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              <div className="overflow-hidden max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="pl-12 pr-4 py-2 flex flex-col gap-1">
+                  <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Thicknesses</button>
+                  {(selectedCategory === 'plywood' ? (plywoodThicknessesByType[selectedPlywoodType] || plywoodThicknessesByType.all) : plywoodThicknessesByType.all).map((thickness) => (
+                    <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === thickness ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{thickness} mm</button>
+                  ))}
                 </div>
               </div>
             </div>
