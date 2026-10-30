@@ -126,6 +126,7 @@ export default function CatalogView({
   const [selectedBrand, setSelectedBrand] = useState<string>('all')
   const [selectedSeries, setSelectedSeries] = useState<string>('all')
   const [selectedThickness, setSelectedThickness] = useState<string>('all')
+  const [isThicknessOpen, setIsThicknessOpen] = useState(false)
   const [selectedFinish, setSelectedFinish] = useState<string>('all')
   const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
   const [selectedPlywoodType, setSelectedPlywoodType] = useState<string>('all')
@@ -420,14 +421,14 @@ export default function CatalogView({
           {/* Thickness Filter */}
           {showThicknessFilter && (
             <div className="px-2 group/filter">
-              <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+              <button type="button" onClick={() => setIsThicknessOpen((open) => !open)} aria-expanded={isThicknessOpen} className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer text-left">
                 <ThicknessIcon />
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Thickness (mm)</span>
-                  <svg className="w-4 h-4 opacity-50 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className={`w-4 h-4 opacity-50 transition-transform duration-300 ${isThicknessOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </div>
-              </div>
-              <div className="overflow-hidden max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isThicknessOpen ? 'max-h-64' : 'max-h-0'}`}>
                 <div className="pl-12 pr-4 py-2 flex flex-col gap-1">
                   <button type="button" onClick={() => setSelectedThickness('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedThickness === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Thicknesses</button>
                   {(selectedCategory === 'plywood' ? (plywoodThicknessesByType[selectedPlywoodType] || plywoodThicknessesByType.all) : plywoodThicknessesByType.all).map((thickness) => (
