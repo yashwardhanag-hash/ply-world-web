@@ -32,10 +32,10 @@ const plywoodTypeByProduct: Record<string, string> = {
 }
 
 const plywoodSizesByType: Record<string, string[]> = {
-  MR: ['8 x 4 ft', '8 x 3 ft', '7 x 4 ft', '7 x 3 ft', '6 x 4 ft', '6 x 3 ft'],
-  PF: ['8 x 4 ft', '8 x 3 ft', '7 x 4 ft', '7 x 3 ft', '6 x 4 ft', '6 x 3 ft'],
-  'Flush Door': ['Height: 72" - 78" (Standard Doors)', 'Height: 80" - 84" (Tall / Main Doors)', 'Height: 88" - 92" (Extra Tall Doors)', 'Custom Size Available'],
-  'PVC Board': ['8 x 4 ft', '8 x 3 ft'],
+  MR: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
+  PF: ['8 × 4 ft', '8 × 3 ft', '7 × 4 ft', '7 × 3 ft', '6 × 4 ft', '6 × 3 ft'],
+  'Flush Door': ['72"–78" (Standard)', '80"–84" (Tall)', '88"–92" (Extra Tall)'],
+  'PVC Board': ['8 × 4 ft', '8 × 3 ft'],
 }
 
 const sanitarywareTypes = [
@@ -173,8 +173,10 @@ export default function CatalogView({
     const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
     return selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
   })
-  const selectedPlywoodSizes = selectedCategory === 'plywood' && selectedPlywoodType !== 'all'
-    ? plywoodSizesByType[selectedPlywoodType] || []
+  const selectedPlywoodSizes = (selectedCategory === 'all' || selectedCategory === 'plywood')
+    ? selectedPlywoodType === 'all'
+      ? plywoodSizesByType.MR
+      : plywoodSizesByType[selectedPlywoodType] || []
     : null
   const allPossibleSizes = selectedPlywoodSizes || Array.from(new Set(currentCategoryProducts.flatMap(p => p.product_variants?.map((v: any) => v.size_ft)))).filter(Boolean) as string[]
 
@@ -387,7 +389,7 @@ export default function CatalogView({
                 <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
                   <button onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
                   {allPossibleSizes.map(size => {
-                    const isValid = validSizes.has(size)
+                    const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
                     return (
                       <button
                         key={size}
