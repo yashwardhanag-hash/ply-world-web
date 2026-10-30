@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, useEffect, useRef, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShoppingCart, Minus, Plus, X, Sparkles, ShowerHead, Check, Layers } from 'lucide-react'
 import laminatesData from '@/data/laminatesData.json'
@@ -58,6 +58,33 @@ const sanitarywareTypes = [
 const sanitarywareTypeByProduct: Record<string, string> = {
   'showcase-roca-inspira': 'Installation System',
   'showcase-sato-basin': 'Wash Basin',
+}
+
+function DrumPicker({ label, values, selected, onChange }: { label: string; values: number[]; selected: number; onChange: (value: number) => void }) {
+  const wheelRef = useRef<HTMLDivElement>(null)
+  const itemHeight = 40
+
+  useEffect(() => {
+    const wheel = wheelRef.current
+    if (!wheel) return
+    wheel.scrollTo({ top: values.indexOf(selected) * itemHeight, behavior: 'smooth' })
+  }, [selected, values])
+
+  const handleScroll = () => {
+    const wheel = wheelRef.current
+    if (!wheel) return
+    const index = Math.max(0, Math.min(values.length - 1, Math.round(wheel.scrollTop / itemHeight)))
+    if (values[index] !== selected) onChange(values[index])
+  }
+
+  return (
+    <div className="min-w-0 flex-1">
+      <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
+      <div ref={wheelRef} onScroll={handleScroll} className="h-[120px] snap-y snap-mandatory overflow-y-auto overscroll-contain rounded-lg bg-slate-950/40 px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ paddingBlock: 40 }}>
+        {values.map((value) => <button key={value} type="button" onClick={() => onChange(value)} className={`flex h-10 w-full snap-center items-center justify-center border-y border-transparent text-base transition-all duration-200 ${value === selected ? 'border-slate-700 text-lg font-bold text-blue-500' : 'scale-90 text-slate-500'}`}>{value}&quot;</button>)}
+      </div>
+    </div>
+  )
 }
 
 function ThicknessIcon() {
@@ -130,6 +157,8 @@ export default function CatalogView({
   const [selectedSanitarywareType, setSelectedSanitarywareType] = useState<string>('all')
   const [selectedPlywoodType, setSelectedPlywoodType] = useState<string>('all')
   const [selectedSize, setSelectedSize] = useState<string>('all')
+  const [flushDoorLength, setFlushDoorLength] = useState(84)
+  const [flushDoorWidth, setFlushDoorWidth] = useState(36)
   const [searchTerm, setSearchTerm] = useState('')
   const [openSidebarFilter, setOpenSidebarFilter] = useState<string | null>(null)
   const [inquiryProduct, setInquiryProduct] = useState<any | null>(null)
@@ -397,21 +426,24 @@ export default function CatalogView({
               </div>
 
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
-                <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
-                  {allPossibleSizes.map(size => {
-                    const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
-                    return (
-                      <button
-                        key={size}
-                        onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)}
-                        disabled={!isValid}
-                        className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}
-                      >
-                        {size}
-                      </button>
-                    )
-                  })}
+                <div className="pl-12 pr-4 py-2 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
+                  {selectedPlywoodType === 'Flush Door' ? (
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <DrumPicker label="Length (Inches)" values={Array.from({ length: 25 }, (_, index) => index + 72)} selected={flushDoorLength} onChange={setFlushDoorLength} />
+                        <DrumPicker label="Width (Inches)" values={Array.from({ length: 25 }, (_, index) => index + 24)} selected={flushDoorWidth} onChange={setFlushDoorWidth} />
+                      </div>
+                      <p className="border-t border-slate-800 pt-3 text-center text-xs font-medium text-slate-300">Selected: {flushDoorLength}&quot; × {flushDoorWidth}&quot; ({Number((flushDoorLength / 12).toFixed(2))} × {Number((flushDoorWidth / 12).toFixed(2))} ft)</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-1">
+                      <button type="button" onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
+                      {allPossibleSizes.map(size => {
+                        const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
+                        return <button key={size} type="button" onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)} disabled={!isValid} className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}>{size}</button>
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
