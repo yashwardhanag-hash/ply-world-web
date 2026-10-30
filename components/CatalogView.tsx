@@ -31,6 +31,13 @@ const plywoodTypeByProduct: Record<string, string> = {
   'showcase-greenply': 'MR',
 }
 
+const plywoodSizesByType: Record<string, string[]> = {
+  MR: ['8 x 4 ft', '8 x 3 ft', '7 x 4 ft', '7 x 3 ft', '6 x 4 ft', '6 x 3 ft'],
+  PF: ['8 x 4 ft', '8 x 3 ft', '7 x 4 ft', '7 x 3 ft', '6 x 4 ft', '6 x 3 ft'],
+  'Flush Door': ['Height: 72" - 78" (Standard Doors)', 'Height: 80" - 84" (Tall / Main Doors)', 'Height: 88" - 92" (Extra Tall Doors)', 'Custom Size Available'],
+  'PVC Board': ['8 x 4 ft', '8 x 3 ft'],
+}
+
 const sanitarywareTypes = [
   'Installation System',
   'Wash Basin',
@@ -162,7 +169,14 @@ export default function CatalogView({
   const allPossibleBrands = selectedCategory === 'all'
     ? Object.values(menuMapping).flat()
     : (menuMapping[selectedCategory] || [])
-  const allPossibleSizes = Array.from(new Set(currentCategoryProducts.flatMap(p => p.product_variants?.map((v: any) => v.size_ft)))).filter(Boolean) as string[]
+  const plywoodTypeProducts = currentCategoryProducts.filter((product: any) => {
+    const plywoodType = product.plywood_type || product.plywoodType || plywoodTypeByProduct[product.id]
+    return selectedPlywoodType === 'all' || plywoodType === selectedPlywoodType
+  })
+  const selectedPlywoodSizes = selectedCategory === 'plywood' && selectedPlywoodType !== 'all'
+    ? plywoodSizesByType[selectedPlywoodType] || []
+    : null
+  const allPossibleSizes = selectedPlywoodSizes || Array.from(new Set(currentCategoryProducts.flatMap(p => p.product_variants?.map((v: any) => v.size_ft)))).filter(Boolean) as string[]
 
   const validBrands = new Set(
     currentCategoryProducts
@@ -171,10 +185,16 @@ export default function CatalogView({
   )
 
   const validSizes = new Set(
-    currentCategoryProducts
+    plywoodTypeProducts
       .filter(p => selectedBrand === 'all' || p.brands?.slug === selectedBrand)
       .flatMap(p => p.product_variants?.map((v: any) => v.size_ft))
   )
+  const selectPlywoodType = (type: string) => {
+    setSelectedPlywoodType(type)
+    if (selectedSize !== 'all' && !((plywoodSizesByType[type] || []).includes(selectedSize))) {
+      setSelectedSize('all')
+    }
+  }
 
   // 3. Final Output
   const finalFilteredProducts = currentCategoryProducts.filter((product: any) => {
@@ -336,12 +356,12 @@ export default function CatalogView({
               </div>
               <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                 <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                  <button type="button" onClick={() => setSelectedPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
+                  <button type="button" onClick={() => selectPlywoodType('all')} className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>All Types</button>
                   {plywoodTypes.map((type) => (
                     <button
                       key={type}
                       type="button"
-                      onClick={() => setSelectedPlywoodType(selectedPlywoodType === type ? 'all' : type)}
+                      onClick={() => selectPlywoodType(selectedPlywoodType === type ? 'all' : type)}
                       className={`text-left text-sm py-1.5 px-3 rounded-md font-medium cursor-pointer transition-colors duration-200 ease-in-out ${selectedPlywoodType === type ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}
                     >
                       {type}
