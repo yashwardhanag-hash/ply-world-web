@@ -367,7 +367,7 @@ export default function CatalogView({
             
             <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
               <div className="pl-12 pr-4 py-2 space-y-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100 flex flex-col">
-                <button onClick={() => setSelectedBrand('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedBrand === 'all' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}>All Brands</button>
+                <button onClick={() => setSelectedBrand('all')} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedBrand === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>All Brands</button>
                 {allPossibleBrands.map(brandSlug => {
                   const brandObj = brands.find(b => b.slug === brandSlug)
                   const isValid = validBrands.has(brandSlug)
@@ -376,7 +376,7 @@ export default function CatalogView({
                       key={brandSlug}
                       onClick={() => isValid && setSelectedBrand(selectedBrand === brandSlug ? 'all' : brandSlug)}
                       disabled={!isValid}
-                      className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedBrand === brandSlug ? 'text-blue-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}
+                      className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedBrand === brandSlug ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}
                     >
                       {brandObj?.name || brandNames[brandSlug] || brandSlug}
                     </button>
@@ -418,7 +418,7 @@ export default function CatalogView({
           {showSizeFilter && (
             <div className="px-2 group/filter">
               <div className="w-full flex items-center px-2 py-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-                <svg className="w-6 h-6 flex-shrink-0 text-purple-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                <svg className="w-6 h-6 flex-shrink-0 text-blue-400 group-hover/filter:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
                 <div className="ml-4 flex-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                   <span className="text-sm font-semibold">Dimensions & Sizes</span>
                   <svg className="w-4 h-4 transition-transform duration-300 group-hover/filter:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
@@ -437,10 +437,10 @@ export default function CatalogView({
                     </div>
                   ) : (
                     <div className="flex flex-col gap-1">
-                      <button type="button" onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedSize === 'all' ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>All Sizes</button>
+                      <button type="button" onClick={() => setSelectedSize('all')} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedSize === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>All Sizes</button>
                       {allPossibleSizes.map(size => {
                         const isValid = selectedCategory === 'all' || selectedCategory === 'plywood' || validSizes.has(size)
-                        return <button key={size} type="button" onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)} disabled={!isValid} className={`text-left text-sm py-1.5 font-medium transition-colors whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-purple-400' : 'text-slate-400 hover:text-white hover:translate-x-1'}`}>{size}</button>
+                        return <button key={size} type="button" onClick={() => isValid && setSelectedSize(selectedSize === size ? 'all' : size)} disabled={!isValid} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out whitespace-nowrap ${!isValid ? 'opacity-30 cursor-not-allowed line-through' : selectedSize === size ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>{size}</button>
                       })}
                     </div>
                   )}
@@ -518,7 +518,7 @@ export default function CatalogView({
                 <div className="overflow-hidden max-h-0 group-hover/filter:max-h-64 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                   <div className="pl-12 pr-4 py-2 flex flex-col gap-1 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
                     {laminateThicknessOptions.map((thickness) => (
-                      <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 font-medium transition-colors ${selectedThickness === thickness ? 'text-amber-300' : 'text-slate-200 hover:text-white hover:translate-x-1'}`}>
+                      <button key={thickness} type="button" onClick={() => setSelectedThickness(selectedThickness === thickness ? 'all' : thickness)} className={`text-left text-sm py-1.5 font-medium transition-colors duration-200 ease-in-out ${selectedThickness === thickness ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200 hover:translate-x-1'}`}>
                         {thickness} mm
                       </button>
                     ))}
@@ -536,7 +536,7 @@ export default function CatalogView({
                 </div>
                 <div className="overflow-hidden max-h-0 group-hover/filter:max-h-[32rem] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
                   <div className="pl-12 pr-3 py-2 flex flex-col gap-2 opacity-0 group-hover/filter:opacity-100 transition-opacity duration-300 delay-100">
-                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-xs font-semibold transition-colors ${selectedFinish === 'all' ? 'text-cyan-300' : 'text-slate-400 hover:text-white'}`}>All finishes</button>
+                    <button type="button" onClick={() => setSelectedFinish('all')} className={`text-left text-xs font-semibold transition-colors duration-200 ease-in-out ${selectedFinish === 'all' ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200'}`}>All finishes</button>
                     {laminateFinishGroups.map((group) => (
                       <details key={group.title} className="group/finish rounded-lg border border-slate-800/80 bg-slate-950/30" open>
                         <summary className="flex cursor-pointer list-none items-center justify-between px-2 py-2 text-xs font-semibold text-slate-200 hover:text-white">
@@ -548,7 +548,7 @@ export default function CatalogView({
                             const available = finish.thicknesses.includes(selectedThickness === 'all' ? '1' : selectedThickness)
                             const selected = selectedFinish === finish.value
                             return (
-                              <button key={`${group.title}-${finish.value}`} type="button" disabled={!available} onClick={() => setSelectedFinish(selected ? 'all' : finish.value)} className={`rounded-md px-2 py-1.5 text-left text-[11px] font-medium transition-all ${available ? selected ? 'bg-cyan-400/15 text-cyan-200' : 'text-slate-300 hover:bg-white/10 hover:text-white' : 'cursor-not-allowed text-slate-600 opacity-40'}`}>
+                              <button key={`${group.title}-${finish.value}`} type="button" disabled={!available} onClick={() => setSelectedFinish(selected ? 'all' : finish.value)} className={`rounded-md px-2 py-1.5 text-left text-[11px] font-medium transition-colors duration-200 ease-in-out ${available ? selected ? 'text-blue-500 font-semibold' : 'text-slate-400 hover:text-slate-200' : 'cursor-not-allowed text-slate-600 opacity-40'}`}>
                                 {finish.label}
                               </button>
                             )
